@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff&family=Josefin+Sans:wght@200&family=Merriweather:ital@1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff&family=Josefin+Sans:wght@200&family=Merriweather:ital@1&family=Noto+Serif+KR&display=swap');
+
+body {
+   /* background-color: rgb(227, 168, 235); */
+   background-color: white;
+   text-align: center;
+   color: white;
+   font: bold 20px 'Josefin Sans', sans-serif;
+   background-image: url('https://images.unsplash.com/photo-1554189097-ffe88e998a2b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80');
+   background-repeat: no-repeat;
+   background-size: cover;
+   height: 100vh;
+}
+
+p {
+   font: bold 20px 'Josefin Sans', sans-serif;
+   color: rgb(255, 184, 53);
+   text-shadow: 1px 1px 1px black;
+}
+
+h3 {
+   color: white;
+   font: bold 40px 'Josefin Sans', sans-serif;
+   background-image: url('../media/grapefruit.png'), url('../media/grapefruit.png');
+   background-position: left top, right top;
+   background-repeat: no-repeat, no-repeat;
+   background-size: auto 100%, auto 100%;
+   padding: 0 50px;
+   margin-left: 10px;
+   margin-right: 10px;
+   line-height: 100px;
+}
+
+hr {
+   border: 2px solid white;
+}
+
+input {
+   color: rgb(6, 66, 0);
+   background-color: rgb(255, 170, 144);
+   border: 3px solid white;
+   border-radius: 4px;
+   padding: 5px 15px;
+   font: bold 15px 'Josefin Sans', sans-serif;
+   cursor: pointer;
+}
+
+input:hover {
+   background: rgba(255, 196, 0, 0.616);
+}
+
+button {
+   color: rgb(6, 66, 0);
+   background-color: rgb(255, 170, 144);
+   border: 3px solid white;
+   border-radius: 4px;
+   padding: 5px 15px;
+   font: bold 15px 'Josefin Sans', sans-serif;
+   cursor: pointer;
+}
+
+button:hover {
+   background: rgba(255, 196, 0, 0.616);
+}
+
+a {
+   font: bold 20px 'Josefin Sans', sans-serif;
+   color: white;
+}
+
+input[type='text'] {
+   background-color: rgba(255, 118, 118, 0.575);
+}
+
+input[type='password'] {
+   background-color: rgba(255, 118, 118, 0.575);
+}
+
+div.box {
+   background: rgba(255, 164, 112, 0.589);
+   border-style: solid;
+   border-color: white;
+   border-radius: 15px;
+   margin: 70px;
+   border-width: 3px;
+   padding: 40px;
+}
+
+div.box2 {
+   background: rgba(255, 162, 100, 0.589);
+   border-style: solid;
+   border-color: white;
+   border-radius: 15px;
+   margin: 40px;
+   border-width: 3px;
+   padding: 40px;
+   height: 600px;
+   color: rgb(255, 247, 234);
+   background-image: url('https://images.unsplash.com/photo-1560963689-b5682b6440f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1096&q=80');
+   background-repeat: no-repeat;
+   background-position: center;
+   background-size: 60%;
+}
+
+div.box-inner {
+   border-style: none;
+   text-align: center;
+   margin: 10px;
+   padding: 10px;
+}
+
+div.blur {
+   text-shadow: 3px 3px 6px rgba(243, 173, 133, 0.829);
+}
+
+div.img {
+   background-image: url('https://images.unsplash.com/photo-1573500883698-e3ef47a95feb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+   background-size: auto 100%;
+   background-repeat: no-repeat;
+   background-position: center;
+   margin: -30px 20px 50px 20px;
+   height: 400px;
+   bottom: 20px;
+   opacity: 0.7;
+}
+
+#menubar {
+   background: rgba(228, 52, 8, 0.185);
+   height: 50px;
+   font-size: 40px;
+   font-weight: 700;
+   padding: 2px;
+   margin: 5px;
+}
+
+#menubar ul {
+   /* 여백과 패딩 모두 0 */
+   margin: 0;
+   padding: 0;
+   width: 90%;
+   display: flex;
+   justify-content: space-evenly;
+}
+
+#menubar ul li {
+   display: inline-block; /* 새 줄로 넘어가지 않게 */
+   list-style-type: none; /* 마커 삭제 */
+   padding: 0px 15px; /* top=bottom=0, left=right=15px */
+}
+
+#menubar ul li a {
+   color: white;
+   text-decoration: none; /* 링크 보이지 않게 */
+}
+
+#menubar ul li a:hover {
+   color: rgb(255, 36, 36); /* 마우스 올라 갈 때 색 */
+   text-shadow: 1px 1px 2px red, 0 0 1em rgb(225, 0, 255), 0 0 0.2em rgb(251, 255, 0);
+}

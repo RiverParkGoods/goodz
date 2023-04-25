@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>상품 테이블</title>
+   </head>
+   <body>
+      <h3>상품 테이블</h3>
+
+      <hr />
+      <form method="post" name="productForm" target="targetURL">
+         <p>
+            검색
+            <select name="searchway">
+               <option value="any">일반 검색</option>
+               <option value="prodId">상품ID로 검색</option>
+               <option value="prodName">상품이름으로 검색</option>
+               <option value="prodArti">아티스트로 검색</option>
+            </select>
+            <input type="text" size="23" name="keyword" />
+            <input
+               type="button"
+               value="검색"
+               onclick="document.targetURL.location.href='./product?keyword='+document.productForm.keyword.value+'&searchway='+document.productForm.searchway.value"
+            />
+         </p>
+         <hr />
+         <p>
+            <span style="background-color: aqua">PRODUCT ID</span>
+            <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
+         </p>
+         <p>
+            <span style="background-color: aqua">PRODUCT NAME</span
+            ><input type="text" size="23" name="prodName" placeholder="ex) 음파반지" />
+         </p>
+         <p>
+            <span style="background-color: aqua">PRODUCT PRICE</span
+            ><input type="number" size="23" name="prodPrice" placeholder="ex) 45000" />
+         </p>
+         <p>
+            <span style="background-color: aqua">PRODUCT ARTIST</span
+            ><input type="text" size="23" name="prodArti" placeholder="ex) IU" />
+         </p>
+
+         <input type="button" value="PRODUCTS" onclick="document.targetURL.location.href='./productList'" />
+
+         <input type="submit" value="Add PRODUCT" formaction="/insert" />
+
+         <input type="submit" value="Modify PRODUCT" formaction="/update" />
+
+         <input type="submit" value="Remove PRODUCT" formaction="/delete" />
+      </form>
+      <hr />
+      <div style="color: brown; font-weight: 700">상품ID - 상품명 - 상품가격 - 아티스트</div>
+      <div scolling="no" style="overflow: hidden">
+         <iframe
+            src="/productList"
+            name="targetURL"
+            frameborder="0"
+            width="80%"
+            style="height: 600px; overflow: auto; overflow: no"
+         ></iframe>
+      </div>
+   </body>
+</html>

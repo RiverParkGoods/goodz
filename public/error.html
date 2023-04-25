@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <title>❗❗Error❗❗</title>
+      <link type="text/css" rel="stylesheet" href="css/mystyle.css" />
+      <script>
+         sessionStorage.setItem('userid', '');
+      </script>
+   </head>
+   <body>
+      <hr />
+      <div class="blur"><h3>Error Page</h3></div>
+      <hr />
+      <div class="box">
+         <p style="font-size: 20px">
+            ⛔⛔⛔오류가 발생하였습니다. ⛔⛔⛔
+            <br />
+            🙏🙏🙏🙏 <span id="fiveSecond">5</span>초 뒤 메인페이지로 이동합니다.🙏🙏🙏🙏
+            <br />
+            <br />
+            <br />
+            <a href="login.html" style="font-size: 18px"> (☞ﾟヮﾟ)☞ 다시 시도하기 </a>
+         </p>
+      </div>
+
+      <hr />
+      <footer class="img"></footer>
+      <script>
+         setInterval(() => {
+            const five = document.getElementById('fiveSecond');
+            console.log(five.textContent);
+            if (five.textContent == 1) {
+               document.location.href = './';
+            }
+            five.textContent = five.textContent - 1;
+         }, 1000);
+      </script>
+   </body>
+</html>

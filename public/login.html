@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <title>Login</title>
+      <link type="text/css" rel="stylesheet" href="css/mystyle.css" />
+   </head>
+   <body>
+      <hr />
+      <div class="blur"><h3>Login</h3></div>
+      <hr />
+      <nav id="menubar">
+         <ul>
+            <li><a href="index.html" target="main">Home</a></li>
+            <li style="visibility: hidden"><a href="aboutme.html">About Me</a></li>
+            <li overflow:hidden;></li>
+            <li overflow:hidden;></li>
+            <li overflow:hidden;></li>
+            <li><a href="login.html">Login</a></li>
+         </ul>
+      </nav>
+      <hr />
+      <div class="box">
+         <form action="/login" name="userForm" method="post">
+            <pre><p>    Userid  : <input type="text" size="15" name="id" id="id" /></p></pre>
+            <pre><p>Password  : <input type="password" size="15" name="pw" /></p></pre>
+
+            <div class="inner">
+               <input type="submit" value="SIGN IN" id="loginBtn" />&nbsp;&nbsp;
+               <input type="reset" value="CANCEL" /><br /><br />
+            </div>
+         </form>
+         <a href="register.html" style="text-decoration: none">SIGN UP</a>
+      </div>
+      <hr />
+      <footer class="img"></footer>
+      <script>
+         const loginBtn = document.getElementById('loginBtn');
+         loginBtn.addEventListener('click', () => {
+            const userid = document.getElementById('id').value;
+            let now = new Date();
+            if (sessionStorage.getItem(userid)) {
+               if (sessionStorage.getItem(userid) < now) userInfo['userid'] = now + new Date('0000-00-00:00:30:00');
+            } else sessionStorage.setItem(userid, now);
+         });
+      </script>
+   </body>
+</html>

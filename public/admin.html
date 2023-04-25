@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <title>User Authentication</title>
+      <link type="text/css" rel="stylesheet" href="css/mystyle.css" />
+      <script>
+         let userInfo = sessionStorage.getItem('userInfo');
+         let userid = sessionStorage.getItem('userid');
+         console.log(userInfo);
+         if (userInfo) {
+            document.location.href = './login.html';
+         }
+      </script>
+   </head>
+   <body>
+      <hr />
+      <div class="blur"><h3>Administration</h3></div>
+      <hr />
+      <nav id="menubar">
+         <ul>
+            <li><a href="admin.html">Home</a></li>
+            <li style="visibility: hidden"><a href="aboutme.html">About Me</a></li>
+            <li overflow:hidden;></li>
+            <li overflow:hidden;></li>
+            <li overflow:hidden;></li>
+            <li><a id="logout" href="index.html">Logout</a></li>
+         </ul>
+      </nav>
+      <hr />
+      <div class="box">
+         <form action="/insert" target="targetURL" name="userForm" method="post">
+            <pre><p>    Userid   : <input type="text" size="15" name="userid" /></p></pre>
+            <pre><p>Password  : <input type="password" size="15" name="pw" /></p></pre>
+            <br />
+            <input type="button" value="get select" onclick='document.targetURL.location.href="/select"' />&nbsp;&nbsp;
+            <input
+               type="button"
+               value="get selectQuery"
+               onclick='document.targetURL.location.href="./selectQuery?userid="+document.userForm.userid.value'
+            />&nbsp;&nbsp;
+            <button type="submit" formaction="/insert">post insert</button>
+            <button type="submit" formaction="/update">post update</button>&nbsp;&nbsp;
+            <button type="submit" formaction="/delete">post delete</button>
+         </form>
+      </div>
+      <hr />
+      <iframe src="" name="targetURL" scrolling="no" height="300px" frameborder="0"></iframe>
+      <hr />
+      <footer class="img"></footer>
+      <script>
+         let user = sessionStorage.getItem('userid');
+         const div = document.getElementsByClassName('blur');
+         div[0].innerHTML += '<p style="color:orange;">' + user + '의 페이지 입니다.</p>';
+         let logout = document.getElementById('logout');
+         logout.addEventListener('click', () => {
+            sessionStorage.setItem('userid', '');
+         });
+      </script>
+   </body>
+</html>
