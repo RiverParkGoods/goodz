@@ -34,15 +34,5 @@
       </div>
       <hr />
       <footer class="img"></footer>
-      <script>
-         const loginBtn = document.getElementById('loginBtn');
-         loginBtn.addEventListener('click', () => {
-            const userid = document.getElementById('id').value;
-            let now = new Date();
-            if (sessionStorage.getItem(userid)) {
-               if (sessionStorage.getItem(userid) < now) userInfo['userid'] = now + new Date('0000-00-00:00:30:00');
-            } else sessionStorage.setItem(userid, now);
-         });
-      </script>
    </body>
 </html>
