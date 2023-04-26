@@ -13,7 +13,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-var main = require('./routes/main.js');
+// const mongoose = require('mongoose');
+// mongoose.connect('mongodb://192.168.1.15:27017/test');
+
+let main = require('./routes/main.js');
 app.use('/', main);
 
 app.listen(app.get('port'), () => {

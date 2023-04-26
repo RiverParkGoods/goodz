@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mysql = require('sync-mysql');
-// const mongoClient = require('mongodb').MongoClient;
-const env = require('dotenv').config({ path: '../.env' });
+const app = express();
+const env = require('dotenv').config({ path: '.env' });
 
 function makeResultTemplate(body) {
    let result = `
@@ -28,11 +28,6 @@ let mysql_conn = new mysql({
    database: process.env.database,
 });
 
-const state = { db: null };
-let dbURL = 'mongodb://192.168.1.15:27017';
-
-const app = express();
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json());
@@ -42,44 +37,9 @@ app.get('/greeting', (req, res) => {
    res.send('Welcome 😊');
 });
 
-// app.post('/login', (req, res) => {
-//    const { id, pw } = req.body;
-//    // const { id:id, pw:pw } = req.body;
-//    const result = mysql_conn.query('select * from user where userid=? and passwd=?', [id, pw]);
-//    if (result.length == 0) {
-//       res.redirect('error.html');
-//    }
-//    if (id == 'admin' || id == 'root') {
-//       console.log(id + ' => Administrator Log-in');
-//       res.redirect('admin.html');
-//    } else {
-//       console.log(id + ' => User Log-in');
-//       res.redirect('user.html');
-//    }
-// });
-
-// app.post('/register', (req, res) => {
-//    const { id, pw } = req.body;
-//    if (id == '') {
-//       res.redirect('register.html');
-//    } else {
-//       let result = mysql_conn.query('select * from user where userid=?', [id]);
-//       if (result.length > 0) {
-//          res.writeHead(200);
-//          let template = makeResultTemplate(`
-//          <div>
-//             <h3 style="margin-left: 30px">Registrer Failed</h3>
-//             <h4 style="margin-left: 30px">Already Exist ID.</h4>
-//             <a href="register.html" style="margin-left: 30px">Try Again</a>
-//          </div>`);
-//          res.end(template);
-//       } else {
-//          result = mysql_conn.query('insert into user values (?, ?)', [id, pw]);
-//          console.log(result.length);
-//          res.redirect('/');
-//       }
-//    }
-// });
+app.get('select', (req, res) => {
+   resselect_result(req, res);
+});
 
 app.get('/product/list', (req, res) => {
    const result = mysql_conn.query('select * from product;');
@@ -233,29 +193,50 @@ app.post('/product/delete', (req, res) => {
       res.write('<script>alert("Product ID를 입력해주세요.");</script>');
    }
 });
-
+321;
 app.get('/error', (req, res) => {
    res.redirect('error.html');
 });
 
-// app.post('/purchase', (req, res) => {
-// mongoClient.connect(dbURL, { useUnifiedTopology: true }, (err, client) => {
-//    console.log('START');
-//    if (err != null) {
-//       res.json({ count: -1 });
-//    } else {
-//       state.db = client.db('test');
-//       state.db
-//          .collection('things')
-//          .find({})
-//          .toArray(function (err, result) {
-//             if (err) throw err;
-//             console.log('result : ');
-//             console.log(result);
-//             res.json(JSON.stringify(result));
-//          });
-//    }
+// const mongoose = require('mongoose');
+
+// //order 정보 수정 예정.
+// let orderSchema = mongoose.Schema(
+//    {
+//       orderIdx: String,
+//       orderNumber: String,
+//       products: Map,
+//       of: String,
+//       orderAmount: String,
+//       orderTotPrice: Number,
+//    },
+//    {
+//       versionKey: false,
+//    },
+// );
+
+// let User = mongoose.model('order', orderSchema);
+// app.get('/Hello', (req, res) => {
+//    res.send('Hello World');
+//    return;
 // });
+
+// app.post('/insert', (req, res, next) => {
+//    let userid = req.body.userid;
+//    let name = req.body.name;
+//    let city = req.body.city;
+//    let gender = req.body.gender;
+//    let age = req.body.age;
+//    let user = new User({ userid: userid, name: name, city: city, gender: gender, age: age });
+//    user.save((err, silence) => {
+//       if (err) {
+//          console.log(err);
+//          res.status(500).send('insert error');
+//          return;
+//       }
+//       res.status(200).send('Inserted');
+//       return;
+//    });
 // });
 
 module.exports = app;
