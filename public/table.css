@@ -1,28 +1,33 @@
+@import url(http://fonts.googleapis.com/earlyaccess/hanna.css);
+
 table {
    /* 이중 테두리 제거 */
    border-collapse: collapse;
+   border: 3px solid;
 }
 td,
 th {
    /* 모든 셀에 적용 */
    text-align: left;
+   /* font: 15px 'Josefin Sans', sans-serif; */
+   font-family: 'Hanna', serif;
    padding: 5px;
    height: 15px;
-   width: 100px;
+   width: 110px;
 }
 thead,
 tfoot {
    /* <thead>의 모든 셀에 적용 */
-   background: darkgray;
-   color: yellow;
+   background: rgba(109, 104, 104, 0.377);
+   color: rgb(8, 8, 8);
 }
 tbody tr:nth-child(even) {
    /* 짝수 <tr>에 적용*/
-   background: aliceblue;
+   background: rgba(165, 169, 172, 0.712);
 }
 tbody tr:hover {
    /* 마우스가 올라오면 pink 배경 */
-   background: pink;
+   background: rgba(208, 228, 153, 0.288);
 }
 
 .empty {

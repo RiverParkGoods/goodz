@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <title>Shin Sae Kyeong</title>
+      <link type="text/css" rel="stylesheet" href="project.css" />
+   </head>
+   <body class="body">
+      <!-- <div class="blur"><h3>WOODZ</h3></div> -->
+
+      <div class="top"></div>
+      <nav id="menubar">
+         <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Logout</a></li>
+         </ul>
+      </nav>
+      <hr />
+      <img src="../media/woodz_center.jpg" width="70%" />
+      <div class="box">
+         <form action="/insert" target="targetURL" name="userForm" method="post">
+            <input
+               type="button"
+               value="Profile"
+               onclick='document.targetURL.location.href="http://192.168.1.58:8000/woodz_profile.html"'
+            />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" value="Product" onclick="document.targetURL.location.href='./product/list1'" />
+         </form>
+      </div>
+      <div class="box3">
+         <!-- <iframe name="targetURL" width="70%" height="500" style="border: none" src="/hello"></iframe> -->
+         <iframe name="targetURL" width="80%" height="1500" style="border: none" src="/greeting"></iframe>
+      </div>
+      <hr />
+   </body>
+</html>

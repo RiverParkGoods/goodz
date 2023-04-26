@@ -63,6 +63,58 @@ app.get('/product/list', (req, res) => {
    res.end(resultPage);
 });
 
+app.get('/product/list1', (req, res) => {
+   const result = mysql_conn.query('SELECT * FROM product WHERE prodArti = "WOODZ";');
+   console.log(result.length);
+   res.writeHead(200);
+   let temp = '';
+   for (let i = 0; i < result.length; i++) {
+      temp += `<tr><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodPrice}</td><td>${result[i].prodArti}</td><td>${result[i].prodImg}</td></tr>`;
+   }
+   let resultPage = makeResultTemplate(` 
+   <table border="1" style="margin: auto; text-align: center">
+      <thead>
+         <tr>
+            <th>PRODUCT ID</th>
+            <th>PRODUCT NAME</th>
+            <th>PRODUCT PRICE</th>
+            <th>PRODUCT ARTIST</th>
+            <th>PRODUCT IMAGE</th>
+         </tr>
+      </thead>
+      <tbody>
+         ${temp}
+      </tbody>
+   </table>`);
+   res.end(resultPage);
+});
+
+app.get('/product/list2', (req, res) => {
+   const result = mysql_conn.query('SELECT * FROM product WHERE prodArti = "IU";');
+   console.log(result.length);
+   res.writeHead(200);
+   let temp = '';
+   for (let i = 0; i < result.length; i++) {
+      temp += `<tr><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodPrice}</td><td>${result[i].prodArti}</td><td>${result[i].prodImg}</td></tr>`;
+   }
+   let resultPage = makeResultTemplate(` 
+   <table border="1" style="margin: auto; text-align: center">
+      <thead>
+         <tr>
+            <th>PRODUCT ID</th>
+            <th>PRODUCT NAME</th>
+            <th>PRODUCT PRICE</th>
+            <th>PRODUCT ARTIST</th>
+            <th>PRODUCT IMAGE</th>
+         </tr>
+      </thead>
+      <tbody>
+         ${temp}
+      </tbody>
+   </table>`);
+   res.end(resultPage);
+});
+
 app.get('/product/search', (req, res) => {
    // 검색 조건 - 검색할때, 상품ID, 상품이름, 아티스트이름 으로 각각 골라 검색하거나, 모두다 검색하는지 선택해서 searchway 로 넘겨줌.
    const searchway = req.query.searchway;
