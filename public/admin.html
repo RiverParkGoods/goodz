@@ -3,13 +3,13 @@
    <head>
       <meta charset="utf-8" />
       <title>User Authentication</title>
-      <link type="text/css" rel="stylesheet" href="css/mystyle.css" />
+      <link type="text/css" rel="stylesheet" href="mystyle.css" />
       <script>
          let userInfo = sessionStorage.getItem('userInfo');
          let userid = sessionStorage.getItem('userid');
          console.log(userInfo);
          if (userInfo) {
-            document.location.href = './login.html';
+            document.location.href = 'login.html';
          }
       </script>
    </head>
