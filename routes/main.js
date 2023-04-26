@@ -219,10 +219,115 @@ app.post('/product/delete', (req, res) => {
    }
 });
 
+//yeonji productStock
+app.get('/productStock/list', (req, res) => {
+   const result = mysql_conn.query('select * from productStock;');
+   console.log(result.length);
+   res.writeHead(200);
+   let temp = '';
+   for (let i = 0; i < result.length; i++) {
+      temp += `<tr><td>${result[i].prodSeq}</td><td>${result[i].prodId}</td><td>${result[i].prodAmount}</td><td>${result[i].prodProv}</td><td>${result[i].prodManu}</td></tr>`;
+   }
+   let resultPage = makeResultTemplate(` 
+   <table border="1" style="margin: auto; text-align: center">
+      <thead>
+         <tr>
+            <th>PRODUCT INDEX</th>
+            <th>PRODUCT ID</th>
+            <th>PRODUCT AMOUNT</th>
+            <th>PRODUCT OF</th>
+            <th>PRODUCT MAKER</th>
+         </tr>
+      </thead>
+      <tbody>
+         ${temp}
+      </tbody>
+   </table>`);
+   res.end(resultPage);
+});
+
+app.get('/productStock/search', (req, res) => {
+   const prodSeq = req.query.prodSeq;
+   console.log(req.query);
+   if (prodSeq == '') {
+      res.write("<script>alert('상품 INDEX를 입력하세요.')</script>");
+   } else {
+      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
+      console.log(result);
+      // res.send(result);
+      if (result.length == 0) {
+         res.end('{"ok":false, "service":"search"}');
+      } else {
+         res.end(JSON.stringify(result));
+      }
+   }
+});
+
+app.post('/productStock/insert', (req, res) => {
+   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
+   console.log(req.body);
+   if (prodSeq == '') {
+      res.write("<script>alert('Product INDEX를 입력해주세요.');</script>");
+   } else {
+      // res.write('<script>confirm("상품 정보를 추가할까요?");</script>');
+      const result = mysql_conn.query('insert into productStock values(?,?,?,?,?);', [
+         prodSeq,
+         prodId,
+         prodAmount,
+         prodProv,
+         prodManu,
+      ]);
+      if (result.affectedRows == 1) {
+         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
+      } else {
+         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
+      }
+   }
+});
+
+app.post('/productStock/update', (req, res) => {
+   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
+   if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
+      // res.send('User-id와 Password를 입력하세요.');
+      res.write("<script>alert('상품 정보를 입력하세요.')</script>");
+   } else {
+      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
+      console.log(result);
+      // res.send(result);
+      if (result.length == 0) {
+         template_nodata(res);
+      } else {
+         const result = mysql_conn.query(
+            'update productStock set prodId=?, prodAmount=?, prodProv=?, prodManu=? where prodSeq=?',
+            [prodId, prodAmount, prodProv, prodManu, prodSeq],
+         );
+         console.log(result);
+         res.redirect('/productStock/search?prodSeq=' + prodSeq);
+      }
+   }
+});
+
+app.post('/productStock/delete', (req, res) => {
+   const prodSeq = req.body.prodSeq;
+   if (prodSeq) {
+      // res.write('<script>confirm("상품 정보를 삭제할까요?");</script>');
+      const result = mysql_conn.query('delete from productStock where prodSeq=?', [prodSeq]);
+      // res.write('<script>window.location="/product/list"</script>');
+      if (result.affectedRows == 1) {
+         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
+      } else {
+         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
+      }
+   } else {
+      res.write('<script>alert("Product INDEX를 입력해주세요.");</script>');
+   }
+});
+
 app.get('/error', (req, res) => {
    res.redirect('error.html');
 });
 
+// mongodb
 const mongoose = require('mongoose');
 
 let orderSchema = mongoose.Schema(
@@ -296,40 +401,6 @@ app.post('/order/insert', (req, res, next) => {
       return;
    });
 });
-//yeonji
-
-app.get('/productStock/list', (req, res) => {
-   const result = mysql_conn.query('select * from productStock;');
-   console.log(result.length);
-   res.writeHead(200);
-   let temp = '';
-   for (let i = 0; i < result.length; i++) {
-      temp += `<tr><td>${result[i].prodSeq}</td><td>${result[i].prodId}</td><td>${result[i].prodAmount}</td><td>${result[i].prodProv}</td><td>${result[i].prodManu}</td></tr>`;
-   }
-   let resultPage = makeResultTemplate(` 
-   <table border="1" style="margin: auto; text-align: center">
-      <thead>
-         <tr>
-            <th>PRODUCT INDEX</th>
-            <th>PRODUCT ID</th>
-            <th>PRODUCT AMOUNT</th>
-            <th>PRODUCT OF</th>
-            <th>PRODUCT MAKER</th>
-         </tr>
-      </thead>
-      <tbody>
-         ${temp}
-      </tbody>
-   </table>`);
-   res.end(resultPage);
-});
-
-// app.get('/productStock/search', (req, res) => {
-//    console.log(req.query);
-//    const searchway = req.query.searchway;
-//    const keyword = req.query.keyword;
-//    let result;
-//    console.log(searchway, keyword);
 
 app.post('/order/update', (req, res, next) => {
    let orderIdx = req.body.orderIdx;
@@ -399,120 +470,4 @@ app.post('/order/delete', (req, res, next) => {
       });
    });
 });
-app.get('/productStock/search', (req, res) => {
-   const prodSeq = req.query.prodSeq;
-   console.log(req.query);
-   if (prodSeq == '') {
-      res.write("<script>alert('상품 INDEX를 입력하세요.')</script>");
-   } else {
-      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
-      console.log(result);
-      // res.send(result);
-      if (result.length == 0) {
-         res.end('{"ok":false, "service":"search"}');
-      } else {
-         res.end(JSON.stringify(result));
-      }
-   }
-});
-
-app.post('/productStock/insert', (req, res) => {
-   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   console.log(req.body);
-   if (prodSeq == '') {
-      res.write("<script>alert('Product INDEX를 입력해주세요.');</script>");
-   } else {
-      // res.write('<script>confirm("상품 정보를 추가할까요?");</script>');
-      const result = mysql_conn.query('insert into productStock values(?,?,?,?,?);', [
-         prodSeq,
-         prodId,
-         prodAmount,
-         prodProv,
-         prodManu,
-      ]);
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
-      } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
-      }
-   }
-});
-
-// app.post('/productStock/update', (req, res) => {
-//    const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-//    let query = 'update product set ';
-//    let q_arr = [];
-//    let q_var = [];
-
-//    if (prodId) {
-//       q_arr.push('prodId=?');
-//       q_var.push(prodId);
-//    }
-
-//    if (prodAmount) {
-//       q_arr.push('prodAmount=?');
-//       q_var.push(prodAmount);
-//    }
-//    if (prodProv) {
-//       q_arr.push('prodProv=?');
-//       q_var.push(prodProv);
-//    }
-//    if (prodManu) {
-//       q_arr.push('prodManu=?');
-//       q_var.push(prodManu);
-//    }
-//    if (prodSeq) {
-//       q_var.push(prodSeq);
-//       query += q_arr.join(',');
-//       // res.write('<script>confirm("상품을 수정할까요?");</script>');
-//       const result = mysql_conn.query(query, q_var);
-//       // res.write('<script>window.location="/product/list"</script>');
-//       if (result.affectedRows == 1) {
-//          res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"update"}');
-//       } else {
-//          res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"update"}');
-//       }
-//    } else {
-//       res.write('<script>alert("PRODUCT INDEX를 입력해주세요.");</script>');
-//    }
-// });
-
-app.post('/productStock/update', (req, res) => {
-   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
-      // res.send('User-id와 Password를 입력하세요.');
-      res.write("<script>alert('상품 정보를 입력하세요.')</script>");
-   } else {
-      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
-      console.log(result);
-      // res.send(result);
-      if (result.length == 0) {
-         template_nodata(res);
-      } else {
-         const result = mysql_conn.query(
-            'update productStock set prodId=?, prodAmount=?, prodProv=?, prodManu=? where prodSeq=?',
-            [prodId, prodAmount, prodProv, prodManu, prodSeq],
-         );
-         console.log(result);
-         res.redirect('/productStock/search?prodSeq=' + prodSeq);
-      }
-   }
-});
-
-app.post('/productStock/delete', (req, res) => {
-   const prodSeq = req.body.prodSeq;
-   if (prodSeq) {
-      // res.write('<script>confirm("상품 정보를 삭제할까요?");</script>');
-      const result = mysql_conn.query('delete from productStock where prodSeq=?', [prodSeq]);
-      // res.write('<script>window.location="/product/list"</script>');
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
-      } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
-      }
-   } else {
-      res.write('<script>alert("Product INDEX를 입력해주세요.");</script>');
-   }
-});
-
 module.exports = app;
