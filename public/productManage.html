@@ -54,7 +54,7 @@
       </form>
       <hr />
       <div style="color: brown; font-weight: 700">상품ID - 상품명 - 상품가격 - 아티스트</div>
-      <div scolling="no" style="overflow: hidden">
+      <div style="overflow: hidden" id="resultTable">
          <iframe
             src="/product/list"
             name="targetURL"
@@ -63,5 +63,50 @@
             style="height: 600px; overflow: auto; overflow: no"
          ></iframe>
       </div>
+      <script>
+         function productTable() {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            let result = document.getElementById('resultTable').children[0].contentWindow.document.body.textContent;
+            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+            let product = JSON.parse(result).product;
+            // console.log(product);
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            tr.innerHTML =
+               '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            let temp = '';
+            for (let i = 0; i < product.length; i++) {
+               temp +=
+                  '<tr><td>' +
+                  product[i].prodId +
+                  '</td><td>' +
+                  product[i].prodName +
+                  '</td><td>' +
+                  product[i].prodPrice +
+                  '</td><td>' +
+                  product[i].prodArti +
+                  '</td><td>' +
+                  product[i].prodImg +
+                  '</td></tr>';
+            }
+            tbody.innerHTML = temp;
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            // console.log(table);
+            body.innerHTML = '';
+            let link = document.createElement('link');
+            link.type = 'text/css';
+            link.rel = 'stylesheet';
+            link.href = '../table.css';
+            head.appendChild(link);
+            body.append(table);
+         }
+         window.onload = () => {
+            productTable();
+         };
+      </script>
    </body>
 </html>

@@ -1,61 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
    <head>
-      <meta charset="utf-8" />
-      <title>User Authentication</title>
-      <link type="text/css" rel="stylesheet" href="mystyle.css" />
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link type="text/css" rel="stylesheet" href="table.css" />
+      <title>관리자 페이지</title>
       <script>
-         let userInfo = sessionStorage.getItem('userInfo');
-         let userid = sessionStorage.getItem('userid');
-         console.log(userInfo);
-         if (userInfo) {
-            document.location.href = 'login.html';
+         function showProductOption(form) {
+            if (form.style.display == 'block') {
+               form.style.display = 'none';
+            } else if (form.style.display == 'none') {
+               form.style.display = 'block';
+            }
          }
       </script>
    </head>
    <body>
+      <h3>관리자 페이지</h3>
+      <input type="button" value="상품 재고 관리" onclick="showStockTable()" />
+      <input type="button" value="상품 추가" onclick="showProductOption(productForm)" />
+      <form method="post" name="productForm" target="target_stock" id="productForm" style="display: none">
+         <hr />
+         <p>
+            <span style="background-color: aqua">PRODUCT IDEX</span>
+            <input type="number" size="23" name="prodSeq" placeholder="ex) 001" />
+         </p>
+         <p>
+            <span style="background-color: aqua">상품 번호</span>
+            <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
+         </p>
+         <p>
+            <span style="background-color: aqua">상품 수량</span
+            ><input type="number" size="23" name="prodAmount" placeholder="ex) 1" />
+         </p>
+         <p>
+            <span style="background-color: aqua">원산지</span
+            ><input type="text" size="23" name="prodProv" placeholder="ex) CHN" />
+         </p>
+         <p>
+            <span style="background-color: aqua">제조사</span
+            ><input type="text" size="23" name="prodManu" placeholder="ex) Edam ent." />
+         </p>
+
+         <!-- <input type="button" value="PRODUCTS" onclick="document.target_stock.location.href='/productStock/list'" /> -->
+         <input type="button" value="PRODUCTS" onclick="drawStockTable()" />
+         <input
+            type="button"
+            value="Search PRODUCT"
+            onclick="document.target_stock.location.href='/productStock/search?prodSeq='+document.productForm.prodSeq.value"
+         />
+
+         <input type="submit" value="Add PRODUCT" formaction="/productStock/insert" />
+
+         <input type="submit" value="Modify PRODUCT" formaction="/productStock/update" />
+
+         <input type="submit" value="Remove PRODUCT" formaction="/productStock/delete" />
+      </form>
       <hr />
-      <div class="blur"><h3>Administration</h3></div>
-      <hr />
-      <nav id="menubar">
-         <ul>
-            <li><a href="admin.html">Home</a></li>
-            <li style="visibility: hidden"><a href="aboutme.html">About Me</a></li>
-            <li overflow:hidden;></li>
-            <li overflow:hidden;></li>
-            <li overflow:hidden;></li>
-            <li><a id="logout" href="index.html">Logout</a></li>
-         </ul>
-      </nav>
-      <hr />
-      <div class="box">
-         <form action="/insert" target="targetURL" name="userForm" method="post">
-            <pre><p>    Userid   : <input type="text" size="15" name="userid" /></p></pre>
-            <pre><p>Password  : <input type="password" size="15" name="pw" /></p></pre>
-            <br />
-            <input type="button" value="get select" onclick='document.targetURL.location.href="/select"' />&nbsp;&nbsp;
-            <input
-               type="button"
-               value="get selectQuery"
-               onclick='document.targetURL.location.href="./selectQuery?userid="+document.userForm.userid.value'
-            />&nbsp;&nbsp;
-            <button type="submit" formaction="/insert">post insert</button>
-            <button type="submit" formaction="/update">post update</button>&nbsp;&nbsp;
-            <button type="submit" formaction="/delete">post delete</button>
-         </form>
+      <div style="color: brown; font-weight: 700">상품INDEX - 상품번호 - 상품이름 - 아티스트 - 상품수량</div>
+      <div scolling="no" style="overflow: hidden" id="resultTable">
+         <iframe
+            src="./productStock/list"
+            name="target_stock"
+            frameborder="0"
+            width="80%"
+            style="height: 600px; overflow: auto; overflow: no"
+         ></iframe>
       </div>
-      <hr />
-      <iframe src="" name="targetURL" scrolling="no" height="300px" frameborder="0"></iframe>
-      <hr />
-      <footer class="img"></footer>
       <script>
-         let user = sessionStorage.getItem('userid');
-         const div = document.getElementsByClassName('blur');
-         div[0].innerHTML += '<p style="color:orange;">' + user + '의 페이지 입니다.</p>';
-         let logout = document.getElementById('logout');
-         logout.addEventListener('click', () => {
-            sessionStorage.setItem('userid', '');
-         });
+         function showStockTable() {
+            if (document.getElementById('resultTable').style.display == 'block') {
+               document.getElementById('resultTable').style.display = 'none';
+            } else if (document.getElementById('resultTable').style.display == 'none') {
+               document.getElementById('resultTable').style.display = 'block';
+            }
+         }
+
+         function drawStockTable() {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            console.log(typeof body);
+            let result = '';
+            try {
+               result = JSON.parse(
+                  document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+               );
+               const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+               let ok = result.ok;
+               if (!ok) return;
+               let productStock = result.productStock;
+               // console.log(product);
+               const table = document.createElement('table');
+               const thead = document.createElement('thead');
+               const tr = document.createElement('tr');
+               tr.innerHTML =
+                  '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
+               thead.appendChild(tr);
+               const tbody = document.createElement('tbody');
+               let temp = '';
+               for (let i = 0; i < productStock.length; i++) {
+                  temp +=
+                     '<tr><td>' +
+                     productStock[i].prodSeq +
+                     '</td><td>' +
+                     productStock[i].prodId +
+                     '</td><td>' +
+                     productStock[i].prodName +
+                     '</td><td>' +
+                     productStock[i].prodArti +
+                     '</td><td>' +
+                     productStock[i].prodAmount +
+                     '</td></tr>';
+               }
+               tbody.innerHTML = temp;
+               table.appendChild(thead);
+               table.appendChild(tbody);
+               // console.log(table);
+               body.innerHTML = '';
+               let link = document.createElement('link');
+               link.type = 'text/css';
+               link.rel = 'stylesheet';
+               link.href = '../table.css';
+               head.appendChild(link);
+               body.append(table);
+            } catch {
+               return;
+            }
+
+            // console.log(body);
+         }
+         window.onload = () => {
+            document.getElementById('resultTable').style.display = 'none';
+            drawStockTable();
+            showStockTable();
+         };
       </script>
    </body>
 </html>
