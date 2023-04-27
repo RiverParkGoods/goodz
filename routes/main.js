@@ -408,24 +408,55 @@ app.get('/product/search', function (req, res) {
       else res.send(CircularJSON.stringify(body));
    });
 });
-app.get('/product/insert', function (req, res) {
-   request(baseurl + '/product/insert', { json: true }, (err, result, body) => {
-      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/insert"}');
-      else res.send(CircularJSON.stringify(body));
+
+app.post('/product/insert', function (req, res) {
+   const { prodId, prodName, prodPrice, prodArti } = req.body;
+   let options = {
+      uri: 'http://192.168.1.15:8000/product/insert',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 4,
+      },
+      form: { prodId: prodId, prodName: prodName, prodPrice: prodPrice, prodArti: prodArti },
+   };
+   request.post(options, (error, response, body) => {
+      res.send(body);
    });
 });
-app.get('/product/update', function (req, res) {
-   request(baseurl + '/product/update', { json: true }, (err, result, body) => {
-      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/update"}');
-      else res.send(CircularJSON.stringify(body));
+
+app.post('/product/update', function (req, res) {
+   const { prodId, prodName, prodPrice, prodArti } = req.body;
+   let options = {
+      uri: 'http://192.168.1.15:8000/product/update',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 4,
+      },
+      form: { prodId: prodId, prodName: prodName, prodPrice: prodPrice, prodArti: prodArti },
+   };
+   request.post(options, (error, response, body) => {
+      res.send(body);
    });
 });
-app.get('/product/delete', function (req, res) {
-   request(baseurl + '/product/delete', { json: true }, (err, result, body) => {
-      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/delete"}');
-      else res.send(CircularJSON.stringify(body));
+
+app.post('/product/delete', function (req, res) {
+   const { prodId } = req.body;
+   let options = {
+      uri: 'http://192.168.1.15:8000/product/delete',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 4,
+      },
+      form: { prodId: prodId },
+   };
+   request.post(options, (error, response, body) => {
+      res.send(body);
    });
 });
+
 app.get('/product/artist', function (req, res) {
    const name = req.query.name;
    request(baseurl + '/product/artist?name=' + encodeURI(name), { json: true }, (err, result, body) => {
@@ -433,6 +464,14 @@ app.get('/product/artist', function (req, res) {
       else res.send(CircularJSON.stringify(body));
    });
 });
+app.get('/product/find', function (req, res) {
+   const prodId = req.query.prodId;
+   request(baseurl + '/product/find?prodId=' + prodId, { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/find"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+
 // const data = JSON.stringify({ todo: 'Buy the milk - Moon' });
 // app.get('/data', function (req, res) {
 //    res.send(data);

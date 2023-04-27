@@ -70,11 +70,11 @@ a {
 }
 
 input[type='text'] {
-   background-color: rgba(255, 118, 118, 0.575);
+   background-color: white;
 }
 
 input[type='password'] {
-   background-color: rgba(255, 118, 118, 0.575);
+   background-color: white;
 }
 
 div.box {
