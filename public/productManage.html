@@ -73,8 +73,7 @@
             const table = document.createElement('table');
             const thead = document.createElement('thead');
             const tr = document.createElement('tr');
-            tr.innerHTML =
-               '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
+            tr.innerHTML = '<th>상품ID </th><th>상품명</th><th>상품가격</th><th>아티스트</th>';
             thead.appendChild(tr);
             const tbody = document.createElement('tbody');
             let temp = '';
@@ -88,8 +87,6 @@
                   product[i].prodPrice +
                   '</td><td>' +
                   product[i].prodArti +
-                  '</td><td>' +
-                  product[i].prodImg +
                   '</td></tr>';
             }
             tbody.innerHTML = temp;

@@ -252,9 +252,7 @@ app.get('/greeting', (req, res) => {
 
 //yeonji productStock
 app.get('/productStock/list', (req, res) => {
-   const productStock = mysql_conn.query(
-      'select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId;',
-   );
+   const productStock = mysql_conn.query('select * from productStock;');
    if (productStock.length > 0) {
       res.write('{"ok":true, "productStock":' + JSON.stringify(productStock) + '}');
       res.end();
@@ -270,10 +268,7 @@ app.get('/productStock/search', (req, res) => {
    if (prodSeq == '') {
       res.write("<script>alert('상품 INDEX를 입력하세요.')</script>");
    } else {
-      const productStock = mysql_conn.query(
-         'select * from (select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId) as stock where prodSeq=?',
-         [prodSeq],
-      );
+      const productStock = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
       if (productStock.length == 0) {
          res.end('{"ok":false, "service":"search"}');
       } else {
@@ -284,45 +279,98 @@ app.get('/productStock/search', (req, res) => {
 
 app.post('/productStock/insert', (req, res) => {
    const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   console.log(req.body);
-   if (prodSeq == '') {
-      res.write("<script>alert('Product INDEX를 입력해주세요.');</script>");
+   // console.log(prodSeq, prodId, prodAmount, prodProv, prodManu);
+   if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
+      res.write("<script>alert('모든 상품 정보를 입력해주세요.');</script>");
    } else {
-      // res.write('<script>confirm("상품 정보를 추가할까요?");</script>');
-      const result = mysql_conn.query('insert into productStock values(?,?,?,?,?);', [
+      const productStock = mysql_conn.query('insert into productStock values(?,?,?,?,?);', [
          prodSeq,
          prodId,
          prodAmount,
          prodProv,
          prodManu,
       ]);
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
+      if (productStock.affectedRows == 1) {
+         res.send('{"ok":true, "db":"mysql", "service":"productStock/insert"}');
       } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
+         res.send('{"ok":false, "db":"mysql", "service":"productStock/insert"}');
       }
    }
 });
 
+// app.post('/productStock/update', (req, res) => {
+//    const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
+//    if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
+//       // res.send('User-id와 Password를 입력하세요.');
+//       res.write("<script>alert('상품 정보를 입력하세요.')</script>");
+//    } else {
+//       const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
+//       // const result = mysql_conn.query(
+//       //    'select * from (select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId) as stock where prodSeq=?',
+//       //    [prodSeq],
+//       // );
+//       console.log(result);
+//       // res.send(result);
+//       if (result.length == 0) {
+//          template_nodata(res);
+//       } else {
+//          const result = mysql_conn.query(
+//             'update productStock set prodId=?, prodAmount=?, prodProv=?, prodManu=? where prodSeq=?',
+//             [prodId, prodAmount, prodProv, prodManu, prodSeq],
+//          );
+//          console.log(result);
+//          res.redirect('/productStock/search?prodSeq=' + prodSeq);
+//       }
+//    }
+// });
+
 app.post('/productStock/update', (req, res) => {
+   // 상품인덱스, 상품번호, 상품수량, 상품원산지, 상품제조사 정보를 request.body에서 뽑아냄.
+
    const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
-      // res.send('User-id와 Password를 입력하세요.');
-      res.write("<script>alert('상품 정보를 입력하세요.')</script>");
-   } else {
-      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
+   console.log(prodSeq, prodId, prodAmount, prodProv, prodManu);
+   // 수정할 값에 대해 공백으로 입력하면 원본을 유지, 입력해준 값들만 새롭게 변경할 예정이라,
+   // 기본적으로 공통적인 query를 변수로 지정.
+   let query = 'update productStock set ';
+   // query에 이어 붙이기 위해 배열로 지정, 추후에 join을 통해 ','로 이어 붙일 예정
+   let q_arr = [];
+   // conn.query의 두번째 파라미터로 ?에 해당하는 변수들을 배열로 지정.
+   let q_var = [];
+
+   if (prodId) {
+      q_arr.push('prodId=?');
+      q_var.push(prodId);
+   }
+   if (prodAmount) {
+      q_arr.push('prodAmount=?');
+      q_var.push(prodAmount);
+   }
+   if (prodProv) {
+      q_arr.push('prodProv=?');
+      q_var.push(prodProv);
+   }
+   if (prodManu) {
+      q_arr.push('prodManu=?');
+      q_var.push(prodManu);
+   }
+   if (prodSeq) {
+      q_var.push(prodSeq);
+
+      query += q_arr.join(',');
+      query += 'where prodSeq=?';
+      console.log(query);
+      console.log(q_var);
+      // res.write('<script>confirm("상품을 수정할까요?");</script>');
+      const result = mysql_conn.query(query, q_var);
+      // res.write('<script>window.location="/product/list"</script>');
       console.log(result);
-      // res.send(result);
-      if (result.length == 0) {
-         template_nodata(res);
+      if (result.affectedRows == 1) {
+         res.send('{"ok":true, "db":"mysql", "service":"productStock/update"}');
       } else {
-         const result = mysql_conn.query(
-            'update productStock set prodId=?, prodAmount=?, prodProv=?, prodManu=? where prodSeq=?',
-            [prodId, prodAmount, prodProv, prodManu, prodSeq],
-         );
-         console.log(result);
-         res.redirect('/productStock/search?prodSeq=' + prodSeq);
+         res.send('{"ok":false, "db":"mysql", "service":"productStock/update"}');
       }
+   } else {
+      res.write('<script>alert("PRODUCT INDEX를 입력해주세요.");</script>');
    }
 });
 
@@ -333,160 +381,71 @@ app.post('/productStock/delete', (req, res) => {
       const result = mysql_conn.query('delete from productStock where prodSeq=?', [prodSeq]);
       // res.write('<script>window.location="/product/list"</script>');
       if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
+         res.send('{"ok":true, "db":"mysql", "service":"productStock/delete"}');
       } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
+         res.send('{"ok":false, "db":"mysql", "service":"productStock/delete"}');
       }
    } else {
       res.write('<script>alert("Product INDEX를 입력해주세요.");</script>');
    }
 });
 
-// app.get('/error', (req, res) => {
-//    res.redirect('error.html');
+const request = require('request');
+const CircularJSON = require('circular-json');
+
+let baseurl = 'http://192.168.1.15:8000';
+app.get('/product/list', function (req, res) {
+   request(baseurl + '/product/list', { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/list"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+app.get('/product/search', function (req, res) {
+   const { keyword, searchway } = req.query;
+   let fullurl = baseurl + '/product/search?keyword=' + encodeURI(keyword) + '&searchway=' + searchway;
+   request(fullurl, { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/search"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+app.get('/product/insert', function (req, res) {
+   request(baseurl + '/product/insert', { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/insert"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+app.get('/product/update', function (req, res) {
+   request(baseurl + '/product/update', { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/update"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+app.get('/product/delete', function (req, res) {
+   request(baseurl + '/product/delete', { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/delete"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+app.get('/product/artist', function (req, res) {
+   const name = req.query.name;
+   request(baseurl + '/product/artist?name=' + encodeURI(name), { json: true }, (err, result, body) => {
+      if (err) res.send('{"ok":false, "db":"mysql", "service":"product/artist"}');
+      else res.send(CircularJSON.stringify(body));
+   });
+});
+// const data = JSON.stringify({ todo: 'Buy the milk - Moon' });
+// app.get('/data', function (req, res) {
+//    res.send(data);
 // });
 
-// // mongodb
-// const mongoose = require('mongoose');
-
-// let orderSchema = mongoose.Schema(
-//    {
-//       orderIdx: String,
-//       orderNumber: String,
-//       prodId: String,
-//       orderAmount: String,
-//       orderTotPrice: Number,
-//    },
-//    {
-//       versionKey: false,
-//    },
-// );
-
-// let Order = mongoose.model('orders', orderSchema);
-
-// app.get('/order/list', (req, res, next) => {
-//    Order.find({}, (err, docs) => {
-//       if (err) console.log(err);
-//       res.send(docs);
-//       // res.send(docs);
-//       return;
-//    });
-//    return;
-// });
-
-// app.get('/order/search', (req, res, next) => {
-//    const searchway = req.query.searchway.toString();
-//    const keyword = req.query.keyword.toString();
-//    if (searchway == 'orderIdx') {
-//       Order.findOne({ orderIdx: keyword }, (err, docs) => {
-//          if (err) console.log(err);
-//          // console.log(docs);
-//          res.send({ order: docs });
-//          return;
-//       });
-//    } else if (searchway == 'orderNumber') {
-//       Order.find({ orderNumber: keyword }, (err, docs) => {
-//          if (err) console.log(err);
-//          // console.log(docs);
-//          res.send({ order: docs });
-//          return;
-//       });
-//    }
-
-//    console.log(req.query.input);
-
-//    return;
-// });
-
-// app.post('/order/insert', (req, res, next) => {
-//    let orderIdx = req.body.orderIdx;
-//    let orderNumber = req.body.orderNumber;
-//    let prodId = req.body.prodId;
-//    let orderAmount = req.body.orderAmount;
-//    let orderTotPrice = req.body.orderTotPrice;
-//    let order = new Order({
-//       orderIdx: orderIdx,
-//       orderNumber: orderNumber,
-//       prodId: prodId,
-//       orderAmount: orderAmount,
-//       orderTotPrice: orderTotPrice,
-//    });
-//    order.save((err, silence) => {
+// option = 'http://192.168.1.15:8000/data';
+// app.get('/rdata', function (req, res) {
+//    request(option, { json: true }, (err, result, body) => {
 //       if (err) {
-//          res.status(500).send({ ok: false, db: 'mongodb', service: 'order/insert' });
-//          return;
+//          res.send('{"ok":false, "db":"mysql", "service":"productStock/delete"}');
 //       }
-//       res.status(200).send({ ok: true, db: 'mongodb', service: 'order/insert' });
-//       return;
+//       res.send(CircularJSON.stringify(body));
 //    });
 // });
 
-// app.post('/order/update', (req, res, next) => {
-//    let orderIdx = req.body.orderIdx;
-//    let orderNumber = req.body.orderNumber;
-//    let prodId = req.body.prodId;
-//    let orderAmount = req.body.orderAmount;
-//    let orderTotPrice = req.body.orderTotPrice;
-//    //    if (searchway == 'prodSeq') {
-//    //       result = mysql_conn.query('select * from productStock where prodSeq=?;', [keyword]);
-//    //    } else if (searchway == 'prodId') {
-//    //       result = mysql_conn.query('select * from productStock where prodId=?;', [keyword]);
-//    //    } else if (searchway == 'any') {
-//    //       result = mysql_conn.query('select * from productStock where prodSeq=? or prodId like ?;', [
-//    //          keyword,
-//    //          '%' + keyword + '%',
-//    //          '%' + keyword + '%',
-//    //       ]);
-//    //    } else {
-//    //       res.redirect('/productStock/list');
-//    //    }
-//    //    console.log(result);
-
-//    Order.findOne({ orderIdx: orderIdx }, (err, order) => {
-//       order.orderNumber = orderNumber;
-//       order.prodId = prodId;
-//       order.orderAmount = orderAmount;
-//       order.orderTotPrice = orderTotPrice;
-//       order.save((err, silence) => {
-//          if (err) {
-//             console.log(err);
-//             res.status(500).send({ ok: false, db: 'mongodb', service: 'order/update' });
-//             return;
-//          }
-//          res.status(200).send({ ok: true, db: 'mongodb', service: 'order/update' });
-//          return;
-//       });
-//    });
-// });
-// //    let resultPage = ``;
-// //    if (result.length > 0) {
-// //       let temp = '';
-// //       console.log(result.length);
-// //       res.writeHead(200);
-// //       res.end('{"ok":true, "productStock":' + JSON.stringify(result) + '}');
-// //    } else {
-// //       resultPage = makeResultTemplate(`
-// //             <div class="empty">
-// //                Can't find Any Data.
-// //             </div> `);
-// //       // res.write('<script>alert("조회 결과가 없어요.");</script>');
-// //       res.send(
-// //          '{"ok":false, "productStock":{"prodSeq":undefined, "prodId":undefined, "prodAmount":undefined, "prodprov":undefined,"prodManu":undefined}}',
-// //       );
-// //    }
-// // });
-
-// app.post('/order/delete', (req, res, next) => {
-//    let orderIdx = req.body.orderIdx;
-//    Order.findOne({ orderIdx: orderIdx }, (err, order) => {
-//       order.deleteOne(err => {
-//          if (err) {
-//             res.status(500).send({ ok: false, db: 'mongodb', service: 'order/delete' });
-//             return;
-//          }
-//          res.status(200).send({ ok: true, db: 'mongodb', service: 'order/delete' });
-//          return;
-//       });
-//    });
-// });
 module.exports = app;

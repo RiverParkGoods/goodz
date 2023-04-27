@@ -10,20 +10,25 @@
       <nav id="menubar">
          <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="login.html">Logout</a></li>
+            <li><a href="http://192.168.1.58:8000/iu_profile.html" target="targetURL">Profile</a></li>
+            <li><a onclick="document.targetURL.location.href='./product/artist?name='+'IU'">Product</a></li>
          </ul>
       </nav>
       <hr />
       <img src="../media/IU-logo.jpg" width="300" height="280" />
       <div class="box">
-         <form action="/insert" target="targetURL" name="userForm" method="post">
+         <!-- <form action="/insert" target="targetURL" name="userForm" method="post">
             <input
                type="button"
                value="Profile"
                onclick='document.targetURL.location.href="http://192.168.1.58:8000/iu_profile.html"'
             />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="button" value="Product" onclick="document.targetURL.location.href='./product/list2'" />
-         </form>
+            <input
+               type="button"
+               value="Product"
+               onclick="document.targetURL.location.href='./product/artist?value='+'IU'"
+            />
+         </form> -->
       </div>
       <div class="box3">
          <!-- <iframe name="targetURL" width="70%" height="500" style="border: none" src="/hello"></iframe> -->
