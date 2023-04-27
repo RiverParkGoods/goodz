@@ -12,25 +12,111 @@
       <nav id="menubar">
          <ul>
             <li><a href="index.html">Home</a></li>
-            <li><a href="login.html">Logout</a></li>
+            <li><a href="http://192.168.1.58:8000/ssk_profile.html" target="targetURL">Profile</a></li>
+            <li>
+               <a onclick="document.targetURL.location.href='./product/artist?name='+'신세경'" id="productBtn"
+                  >Product</a
+               >
+            </li>
          </ul>
       </nav>
       <hr />
       <img width="750" src="../media/ssk-logo.png" />
       <div class="box">
-         <form action="/insert" target="targetURL" name="userForm" method="post">
-            <input
-               type="button"
-               value="Profile"
-               onclick='document.targetURL.location.href="http://192.168.1.58:8000/woodz_profile.html"'
-            />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="button" value="Product" onclick="document.targetURL.location.href='./product/list1'" />
+         <form
+            action="/insert"
+            target="targetURL"
+            name="userForm"
+            method="post"
+            style="display: flex; justify-content: space-around"
+         >
+            <span>
+               <input type="text" id="productId" name="prodId" />&nbsp;상품번호&nbsp;
+               <input
+                  type="button"
+                  value="검색"
+                  id="findBtn"
+                  onclick="document.targetURL.location.href='./product/find?prodId='+document.getElementById('productId').value"
+               />
+            </span>
+            <span>
+               <input type="text" id="prodPrice" style="visibility: hidden" name="prodPrice" />
+            </span>
+            <span>
+               <input type="number" id="productQty" name="orderAmount" />&nbsp;수량&nbsp; <input type="submit"
+               value="구매" formaction="/order/insert"" />
+            </span>
          </form>
       </div>
-      <div class="box3">
+      <div class="box3" id="resultTable">
          <!-- <iframe name="targetURL" width="70%" height="500" style="border: none" src="/hello"></iframe> -->
          <iframe name="targetURL" width="80%" height="1500" style="border: none" src="/greeting"></iframe>
       </div>
       <hr />
+      <script>
+         function productTable(product) {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+
+            let heads = [];
+            for (let head of product) {
+               heads = Object.keys(head);
+               break;
+            }
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+            for (let th of heads) {
+               tr.innerHTML += '<th>' + th.toUpperCase() + '</th>';
+            }
+            // tr.innerHTML = '<th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT PRICE</th><th>PRODUCT ARTIST</th>';
+
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            let temp = '';
+            for (let prod_row = 0; prod_row < product.length; prod_row++) {
+               temp += '<tr>';
+               for (let head_row = 0; head_row < heads.length; head_row++) {
+                  temp += '<td>' + product[prod_row][heads[head_row]] + '</td>';
+               }
+               temp += '</tr>';
+            }
+
+            tbody.innerHTML = temp;
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            body.innerHTML = '';
+            let link = document.createElement('link');
+            link.type = 'text/css';
+            link.rel = 'stylesheet';
+            link.href = '../table.css';
+            head.appendChild(link);
+            body.append(table);
+         }
+         window.onload = () => {
+            document.getElementById('productBtn').addEventListener('click', () => {
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  if (result.ok) productTable(product);
+               }, 100);
+            });
+            document.getElementById('findBtn').addEventListener('click', () => {
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  console.log(product[0]);
+                  if (result.ok) productTable(product);
+                  const prodPrice = document.getElementById('prodPrice');
+                  prodPrice.value = product[0].prodPrice;
+               }, 100);
+            });
+         };
+      </script>
    </body>
 </html>

@@ -27,27 +27,13 @@
             />
          </p>
          <hr />
-         <p>
-            <span style="background-color: aqua">PRODUCT ID</span>
-            <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
-         </p>
-         <p>
-            <span style="background-color: aqua">PRODUCT NAME</span
-            ><input type="text" size="23" name="prodName" placeholder="ex) 음파반지" />
-         </p>
-         <p>
-            <span style="background-color: aqua">PRODUCT PRICE</span
-            ><input type="number" size="23" name="prodPrice" placeholder="ex) 45000" />
-         </p>
-         <p>
-            <span style="background-color: aqua">PRODUCT ARTIST</span
-            ><input type="text" size="23" name="prodArti" placeholder="ex) IU" />
-         </p>
 
-         <input type="button" value="PRODUCTS" onclick="document.targetURL.location.href='./product/list'" />
-
-         <input type="submit" value="Add PRODUCT" formaction="/product/insert" />
-
+         <input
+            type="button"
+            id="productBtn"
+            value="PRODUCTS"
+            onclick="document.targetURL.location.href='./product/list'"
+         />
          <input type="submit" value="Modify PRODUCT" formaction="/product/update" />
 
          <input type="submit" value="Remove PRODUCT" formaction="/product/delete" />
@@ -64,38 +50,38 @@
          ></iframe>
       </div>
       <script>
-         function productTable() {
+         function productTable(product) {
             const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
-            let result = document.getElementById('resultTable').children[0].contentWindow.document.body.textContent;
             const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
-            let product = JSON.parse(result).product;
-            // console.log(product);
+
+            let heads = [];
+            for (let head of product) {
+               heads = Object.keys(head);
+               break;
+            }
+
             const table = document.createElement('table');
             const thead = document.createElement('thead');
             const tr = document.createElement('tr');
-            tr.innerHTML =
-               '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
+            for (let th of heads) {
+               tr.innerHTML += '<th>' + th.toUpperCase() + '</th>';
+            }
+            // tr.innerHTML = '<th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT PRICE</th><th>PRODUCT ARTIST</th>';
+
             thead.appendChild(tr);
             const tbody = document.createElement('tbody');
             let temp = '';
-            for (let i = 0; i < product.length; i++) {
-               temp +=
-                  '<tr><td>' +
-                  product[i].prodId +
-                  '</td><td>' +
-                  product[i].prodName +
-                  '</td><td>' +
-                  product[i].prodPrice +
-                  '</td><td>' +
-                  product[i].prodArti +
-                  '</td><td>' +
-                  product[i].prodImg +
-                  '</td></tr>';
+            for (let prod_row = 0; prod_row < product.length; prod_row++) {
+               temp += '<tr>';
+               for (let head_row = 0; head_row < heads.length; head_row++) {
+                  temp += '<td>' + product[prod_row][heads[head_row]] + '</td>';
+               }
+               temp += '</tr>';
             }
+
             tbody.innerHTML = temp;
             table.appendChild(thead);
             table.appendChild(tbody);
-            // console.log(table);
             body.innerHTML = '';
             let link = document.createElement('link');
             link.type = 'text/css';
@@ -105,7 +91,23 @@
             body.append(table);
          }
          window.onload = () => {
-            productTable();
+            setTimeout(() => {
+               let result = JSON.parse(
+                  document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+               );
+               let product = result.product;
+               if (result.ok) productTable(product);
+            }, 100);
+            document.getElementById('productBtn').addEventListener('click', () => {
+               // console.log('눌리');
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  if (result.ok) productTable(product);
+               }, 100);
+            });
          };
       </script>
    </body>

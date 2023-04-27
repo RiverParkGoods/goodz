@@ -4,13 +4,6 @@
       <meta charset="UTF-8" />
       <title>User page</title>
       <link type="text/css" rel="stylesheet" href="mystyle.css" />
-      <script>
-         console.log('체크해보자');
-         if (sessionStorage.getItem('userid').length <= 0) {
-            console.log('아이구');
-            document.location.href = './login.html';
-         }
-      </script>
    </head>
    <body>
       <hr />
@@ -18,12 +11,10 @@
       <hr />
       <nav id="menubar">
          <ul>
-            <li><a href="user.html" target="main">Home</a></li>
-            <li><a href="aboutme.html" target="main">About Me</a></li>
+            <li><a href="index.html" target="main">Home</a></li>
             <li overflow:hidden;></li>
             <li overflow:hidden;></li>
             <li overflow:hidden;></li>
-            <li><a id="logout" href="index.html">Logout</a></li>
          </ul>
       </nav>
       <hr />

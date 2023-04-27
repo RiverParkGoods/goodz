@@ -21,68 +21,45 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/greeting', (req, res) => {
    res.send('Welcome 😊');
 });
+function leftPad(value) {
+   if (value >= 10) {
+      return value;
+   }
+
+   return `0${value}`;
+}
+function toStringByFormatting(source, delimiter = '') {
+   const year = source.getFullYear();
+   const month = leftPad(source.getMonth() + 1);
+   const day = leftPad(source.getDate());
+   const hour = leftPad(source.getHours());
+   const min = leftPad(source.getMinutes());
+   const sec = leftPad(source.getSeconds());
+   return [year, month, day, hour, min, sec].join(delimiter);
+}
 
 app.get('/product/list', (req, res) => {
    let product = mysql_conn.query('select * from product;');
-   if (product.length > 0) {
-      res.write('{"ok":true, "product":' + JSON.stringify(product) + '}');
-      res.end();
-   } else {
-      res.send('{"ok":false, "db":"mysql", "service":"product/list"}');
-      return;
-   }
+   if (product.length > 0) res.send('{"ok":true, "product":' + JSON.stringify(product) + '}');
+   else res.send('{"ok":false, "db":"mysql", "service":"product/list"}');
+   return;
 });
 
-app.get('/product/list1', (req, res) => {
-   const result = mysql_conn.query('SELECT * FROM product WHERE prodArti = "WOODZ";');
-   console.log(result.length);
-   res.writeHead(200);
-   let temp = '';
-   for (let i = 0; i < result.length; i++) {
-      temp += `<tr><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodPrice}</td><td>${result[i].prodArti}</td><td>${result[i].prodImg}</td></tr>`;
-   }
-   let resultPage = makeResultTemplate(` 
-   <table border="1" style="margin: auto; text-align: center">
-      <thead>
-         <tr>
-            <th>PRODUCT ID</th>
-            <th>PRODUCT NAME</th>
-            <th>PRODUCT PRICE</th>
-            <th>PRODUCT ARTIST</th>
-            <th>PRODUCT IMAGE</th>
-         </tr>
-      </thead>
-      <tbody>
-         ${temp}
-      </tbody>
-   </table>`);
-   res.end(resultPage);
+app.get('/product/artist', (req, res, next) => {
+   const name = req.query.name;
+   const product = mysql_conn.query('select * from product where prodArti=?;', [name]);
+
+   if (product.length > 0) res.send('{"ok":true, "product":' + JSON.stringify(product) + '}');
+   else res.send('{"ok":false, "db":"mysql", "service":"product/artist"}');
+   return;
 });
 
-app.get('/product/list2', (req, res) => {
-   const result = mysql_conn.query('SELECT * FROM product WHERE prodArti = "IU";');
-   console.log(result.length);
-   res.writeHead(200);
-   let temp = '';
-   for (let i = 0; i < result.length; i++) {
-      temp += `<tr><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodPrice}</td><td>${result[i].prodArti}</td><td>${result[i].prodImg}</td></tr>`;
-   }
-   let resultPage = makeResultTemplate(` 
-   <table border="1" style="margin: auto; text-align: center">
-      <thead>
-         <tr>
-            <th>PRODUCT ID</th>
-            <th>PRODUCT NAME</th>
-            <th>PRODUCT PRICE</th>
-            <th>PRODUCT ARTIST</th>
-            <th>PRODUCT IMAGE</th>
-         </tr>
-      </thead>
-      <tbody>
-         ${temp}
-      </tbody>
-   </table>`);
-   res.end(resultPage);
+app.get('/product/find', (req, res) => {
+   let prodId = req.query.prodId;
+   let product = mysql_conn.query('select * from product where prodId=?;', [prodId]);
+   if (product.length > 0) res.send('{"ok":true, "product":' + JSON.stringify(product) + '}');
+   else res.send('{"ok":false, "db":"mysql", "service":"product/find"}');
+   return;
 });
 
 app.get('/product/search', (req, res) => {
@@ -116,80 +93,25 @@ app.get('/product/search', (req, res) => {
          '%' + keyword + '%',
       ]);
    }
-   //결과로 보여지는 테이블을 담기위해 resultPage 변수 생성
-   let resultPage = ``;
-   if (product.length > 0) {
-      res.write('{"ok":true, "product":' + JSON.stringify(product) + '}');
-      resultPage = listPage(product);
-      res.end(resultPage);
-      return;
-   } else {
-      res.send('{"ok":false, "db":"mysql", "service":"product/list"}');
-      return;
-   }
-
-   //result가 있는 경우에만 table로 찍고, 없는 경우엔 조회결과가 없음을 띄운다.
-   if (result.length > 0) {
-      res.writeHead(200);
-      // res.end('{"ok":true, "product":' + JSON.stringify(result) + '}');
-      let temp = '';
-      for (let i = 0; i < result.length; i++) {
-         temp += `<tr><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodPrice}</td><td>${result[i].prodArti}</td><td>${result[i].prodImg}</td></tr>`;
-      }
-      resultPage = makeResultTemplate(`
-         <table border="1" style="margin: auto; text-align: center">
-            <thead>
-               <tr>
-                  <th>PRODUCT ID</th>
-                  <th>PRODUCT NAME</th>
-                  <th>PRODUCT PRICE</th>
-                  <th>PRODUCT ARTIST</th>
-                  <th>PRODUCT IMAGE</th>
-               </tr>
-            </thead>
-            <tbody>
-               ${temp}
-            </tbody>
-         </table>
-      `);
-      res.end(resultPage);
-   } else {
-      resultPage = makeResultTemplate(`
-            <div class="empty">
-               Can't find Any Data.
-            </div> `);
-      // res.write('<script>alert("조회 결과가 없어요.");</script>');
-      // res.send(
-      //    '{"ok":false, "product":{"prodId":undefined, "prodName":undefined, "prodPrice":undefined,"prodArti":undefined, "prodImg":undefined}}',
-      // );
-      res.end(resultPage);
-   }
+   if (product.length > 0) res.send('{"ok":true, "product":' + JSON.stringify(product) + '}');
+   else res.send('{"ok":false, "db":"mysql", "service":"product/search"}');
+   return;
 });
 
 app.post('/product/insert', (req, res) => {
    // 상품ID, 상품이름, 상품가격, 상품의아티스트 정보를 request.body에서 뽑아냄.
    const { prodId, prodName, prodPrice, prodArti } = req.body;
-   // 사진 정보를 추가 할 것 이어서, 데이터 확인을 위해서만 default.png로 일괄 지정
-   let prodImg = 'default.png';
    // 입력 값들이 들어있지 않은 경우에 대한 error handling
    if (prodId == '' || prodName == '' || prodPrice == '' || prodArti == '') {
       res.write("<script>alert('모든 상품 정보를 입력해주세요.');</script>");
    } else {
       // insert query 작성후 결과를 result로.
-      const result = mysql_conn.query('insert into product values(?,?,?,?,?);', [
-         prodId,
-         prodName,
-         prodPrice,
-         prodArti,
-         prodImg,
-      ]);
+      const result = mysql_conn.query('insert into product values(?,?,?,?);', [prodId, prodName, prodPrice, prodArti]);
       //추후에 페이지에 추가된 결과로 보여지게 res.redirect를 활용할 예정
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "db":"mysql", "service":"product/insert"}');
-      } else {
-         res.send('{"ok":false, "db":"mysql", "service":"product/insert"}');
-      }
+      if (result.affectedRows == 1) res.send('{"ok":true, "db":"mysql", "service":"product/insert"}');
+      else res.send('{"ok":false, "db":"mysql", "service":"product/insert"}');
    }
+   return;
 });
 
 app.post('/product/update', (req, res) => {
@@ -221,129 +143,24 @@ app.post('/product/update', (req, res) => {
       query += q_arr.join(',');
       query += 'where prodId=?';
 
-      // res.write('<script>confirm("상품을 수정할까요?");</script>');
       const result = mysql_conn.query(query, q_var);
-      // res.write('<script>window.location="/product/list"</script>');
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "db":"mysql", "service":"product/update"}');
-      } else {
-         res.send('{"ok":false, "db":"mysql", "service":"product/update"}');
-      }
-   } else {
-      res.write('<script>alert("PRODUCT ID를 입력해주세요.");</script>');
-   }
+      if (result.affectedRows == 1) res.send('{"ok":true, "db":"mysql", "service":"product/update"}');
+      else res.send('{"ok":false, "db":"mysql", "service":"product/update"}');
+   } else res.send('<script>alert("PRODUCT ID를 입력해주세요.");</script>');
+   return;
 });
 
 app.post('/product/delete', (req, res) => {
+   // console.log(req.body);
    const prodId = req.body.prodId;
    if (prodId) {
       // res.write('<script>confirm("상품 정보를 삭제할까요?");</script>');
       const result = mysql_conn.query('delete from product where prodId=?', [prodId]);
       // res.write('<script>window.location="/product/list"</script>');
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "db":"mysql", "service":"product/delete"}');
-      } else {
-         res.send('{"ok":false, "db":"mysql", "service":"product/delete"}');
-      }
-   } else {
-      res.write('<script>alert("Product ID를 입력해주세요.");</script>');
-   }
-});
-
-//yeonji productStock
-app.get('/productStock/list', (req, res) => {
-   const productStock = mysql_conn.query(
-      'select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId;',
-   );
-   if (productStock.length > 0) {
-      res.write('{"ok":true, "productStock":' + JSON.stringify(productStock) + '}');
-      res.end();
-   } else {
-      res.send('{"ok":false, "db":"mysql", "service":"productStock/list"}');
-      return;
-   }
-});
-
-app.get('/productStock/search', (req, res) => {
-   const prodSeq = req.query.prodSeq;
-   // console.log(req.query);
-   if (prodSeq == '') {
-      res.write("<script>alert('상품 INDEX를 입력하세요.')</script>");
-   } else {
-      const productStock = mysql_conn.query(
-         'select * from (select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId) as stock where prodSeq=?',
-         [prodSeq],
-      );
-      if (productStock.length == 0) {
-         res.end('{"ok":false, "service":"search"}');
-      } else {
-         res.end(JSON.stringify(productStock));
-      }
-   }
-});
-
-app.post('/productStock/insert', (req, res) => {
-   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   console.log(req.body);
-   if (prodSeq == '') {
-      res.write("<script>alert('Product INDEX를 입력해주세요.');</script>");
-   } else {
-      // res.write('<script>confirm("상품 정보를 추가할까요?");</script>');
-      const result = mysql_conn.query('insert into productStock values(?,?,?,?,?);', [
-         prodSeq,
-         prodId,
-         prodAmount,
-         prodProv,
-         prodManu,
-      ]);
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
-      } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"insert"}');
-      }
-   }
-});
-
-app.post('/productStock/update', (req, res) => {
-   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
-   if (prodSeq == '' || prodId == '' || prodAmount == '' || prodProv == '' || prodManu == '') {
-      // res.send('User-id와 Password를 입력하세요.');
-      res.write("<script>alert('상품 정보를 입력하세요.')</script>");
-   } else {
-      const result = mysql_conn.query('select * from productStock where prodSeq=?', [prodSeq]);
-      console.log(result);
-      // res.send(result);
-      if (result.length == 0) {
-         template_nodata(res);
-      } else {
-         const result = mysql_conn.query(
-            'update productStock set prodId=?, prodAmount=?, prodProv=?, prodManu=? where prodSeq=?',
-            [prodId, prodAmount, prodProv, prodManu, prodSeq],
-         );
-         console.log(result);
-         res.redirect('/productStock/search?prodSeq=' + prodSeq);
-      }
-   }
-});
-
-app.post('/productStock/delete', (req, res) => {
-   const prodSeq = req.body.prodSeq;
-   if (prodSeq) {
-      // res.write('<script>confirm("상품 정보를 삭제할까요?");</script>');
-      const result = mysql_conn.query('delete from productStock where prodSeq=?', [prodSeq]);
-      // res.write('<script>window.location="/product/list"</script>');
-      if (result.affectedRows == 1) {
-         res.send('{"ok":true, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
-      } else {
-         res.send('{"ok":false, "affectedRows":' + result.affectedRows + ', "service":"delete"}');
-      }
-   } else {
-      res.write('<script>alert("Product INDEX를 입력해주세요.");</script>');
-   }
-});
-
-app.get('/error', (req, res) => {
-   res.redirect('error.html');
+      if (result.affectedRows == 1) res.send('{"ok":true, "db":"mysql", "service":"product/delete"}');
+      else res.send('{"ok":false, "db":"mysql", "service":"product/delete"}');
+   } else res.send('<script>alert("Product ID를 입력해주세요.");</script>');
+   return;
 });
 
 // mongodb
@@ -363,12 +180,10 @@ let orderSchema = mongoose.Schema(
 );
 
 let Order = mongoose.model('orders', orderSchema);
-
 app.get('/order/list', (req, res, next) => {
-   Order.find({}, (err, docs) => {
-      if (err) console.log(err);
-      res.send(docs);
-      // res.send(docs);
+   Order.find({}, { _id: 0 }).exec((err, order) => {
+      if (err) res.send({ ok: false, db: 'mongodb', service: 'order/search' });
+      else res.send({ ok: true, order: order });
       return;
    });
    return;
@@ -378,32 +193,26 @@ app.get('/order/search', (req, res, next) => {
    const searchway = req.query.searchway.toString();
    const keyword = req.query.keyword.toString();
    if (searchway == 'orderIdx') {
-      Order.findOne({ orderIdx: keyword }, (err, docs) => {
-         if (err) console.log(err);
-         // console.log(docs);
-         res.send({ order: docs });
+      Order.findOne({ orderIdx: keyword }, { _id: 0 }).exec((err, order) => {
+         if (err) res.send({ ok: false, db: 'mongodb', service: 'order/search' });
+         else res.send({ ok: true, order: order });
          return;
       });
    } else if (searchway == 'orderNumber') {
-      Order.find({ orderNumber: keyword }, (err, docs) => {
-         if (err) console.log(err);
-         // console.log(docs);
-         res.send({ order: docs });
+      Order.find({ orderNumber: keyword }, { _id: 0 }).exec((err, order) => {
+         if (err) res.send({ ok: false, db: 'mongodb', service: 'order/search' });
+         else res.send({ ok: true, order: order });
          return;
       });
    }
-
-   console.log(req.query.input);
-
    return;
 });
 
+let orderIdx = 1;
 app.post('/order/insert', (req, res, next) => {
-   let orderIdx = req.body.orderIdx;
-   let orderNumber = req.body.orderNumber;
-   let prodId = req.body.prodId;
-   let orderAmount = req.body.orderAmount;
-   let orderTotPrice = req.body.orderTotPrice;
+   let orderNumber = toStringByFormatting(new Date());
+   let { prodId, orderAmount, prodPrice } = req.body;
+   let orderTotPrice = Number(orderAmount) * Number(prodPrice);
    let order = new Order({
       orderIdx: orderIdx,
       orderNumber: orderNumber,
@@ -411,82 +220,117 @@ app.post('/order/insert', (req, res, next) => {
       orderAmount: orderAmount,
       orderTotPrice: orderTotPrice,
    });
+   orderIdx += 1;
+   console.log(order);
    order.save((err, silence) => {
-      if (err) {
-         res.status(500).send({ ok: false, db: 'mongodb', service: 'order/insert' });
-         return;
-      }
-      res.status(200).send({ ok: true, db: 'mongodb', service: 'order/insert' });
+      if (err) res.status(500).send({ ok: false, db: 'mongodb', service: 'order/insert' });
+      else res.status(200).send({ ok: true, db: 'mongodb', service: 'order/insert' });
       return;
    });
 });
 
 app.post('/order/update', (req, res, next) => {
-   let orderIdx = req.body.orderIdx;
-   let orderNumber = req.body.orderNumber;
-   let prodId = req.body.prodId;
-   let orderAmount = req.body.orderAmount;
-   let orderTotPrice = req.body.orderTotPrice;
-   //    if (searchway == 'prodSeq') {
-   //       result = mysql_conn.query('select * from productStock where prodSeq=?;', [keyword]);
-   //    } else if (searchway == 'prodId') {
-   //       result = mysql_conn.query('select * from productStock where prodId=?;', [keyword]);
-   //    } else if (searchway == 'any') {
-   //       result = mysql_conn.query('select * from productStock where prodSeq=? or prodId like ?;', [
-   //          keyword,
-   //          '%' + keyword + '%',
-   //          '%' + keyword + '%',
-   //       ]);
-   //    } else {
-   //       res.redirect('/productStock/list');
-   //    }
-   //    console.log(result);
-
+   let { orderIdx, orderNumber, prodId, orderAmount, orderTotPrice } = req.body;
    Order.findOne({ orderIdx: orderIdx }, (err, order) => {
       order.orderNumber = orderNumber;
       order.prodId = prodId;
       order.orderAmount = orderAmount;
       order.orderTotPrice = orderTotPrice;
       order.save((err, silence) => {
-         if (err) {
-            console.log(err);
-            res.status(500).send({ ok: false, db: 'mongodb', service: 'order/update' });
-            return;
-         }
-         res.status(200).send({ ok: true, db: 'mongodb', service: 'order/update' });
+         if (err) res.status(500).send({ ok: false, db: 'mongodb', service: 'order/update' });
+         else res.status(200).send({ ok: true, db: 'mongodb', service: 'order/update' });
          return;
       });
    });
 });
-//    let resultPage = ``;
-//    if (result.length > 0) {
-//       let temp = '';
-//       console.log(result.length);
-//       res.writeHead(200);
-//       res.end('{"ok":true, "productStock":' + JSON.stringify(result) + '}');
-//    } else {
-//       resultPage = makeResultTemplate(`
-//             <div class="empty">
-//                Can't find Any Data.
-//             </div> `);
-//       // res.write('<script>alert("조회 결과가 없어요.");</script>');
-//       res.send(
-//          '{"ok":false, "productStock":{"prodSeq":undefined, "prodId":undefined, "prodAmount":undefined, "prodprov":undefined,"prodManu":undefined}}',
-//       );
-//    }
-// });
 
 app.post('/order/delete', (req, res, next) => {
    let orderIdx = req.body.orderIdx;
    Order.findOne({ orderIdx: orderIdx }, (err, order) => {
       order.deleteOne(err => {
-         if (err) {
-            res.status(500).send({ ok: false, db: 'mongodb', service: 'order/delete' });
-            return;
-         }
-         res.status(200).send({ ok: true, db: 'mongodb', service: 'order/delete' });
+         if (err) res.status(500).send({ ok: false, db: 'mongodb', service: 'order/delete' });
+         else res.status(200).send({ ok: true, db: 'mongodb', service: 'order/delete' });
          return;
       });
    });
 });
+
+app.post('/login', (req, res, next) => {
+   let { id, pw } = req.body;
+   if (id == 'admin' && pw == '1234') res.redirect('http://192.168.1.15:8000/admin.html');
+   else res.redirect('login.html');
+});
+
+const request = require('request');
+const CircularJSON = require('circular-json');
+
+let baseURL = 'http://192.168.1.58:8000';
+app.get('/productStock/list', (req, res) => {
+   request(baseURL + '/productStock/list', { json: true }, (err, result, productStock) => {
+      if (err) res.send(CircularJSON.stringify({ ok: false, db: 'mysql', service: 'productStock/list' }));
+      else res.send(CircularJSON.stringify(productStock));
+   });
+   return;
+});
+
+app.get('/productStock/search', (req, res) => {
+   const prodSeq = req.query.prodSeq;
+   request(baseURL + '/productStock/search?prodSeq=' + prodSeq, { json: true }, (err, result, productStock) => {
+      if (err) res.send(CircularJSON.stringify({ ok: false, db: 'mysql', service: 'productStock/search' }));
+      else res.send(CircularJSON.stringify(productStock));
+   });
+   return;
+});
+
+app.post('/productStock/insert', (req, res) => {
+   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
+   let options = {
+      uri: 'http://192.168.1.58:8000/productStock/insert',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 5,
+      },
+      form: { prodSeq: prodSeq, prodId: prodId, prodAmount: prodAmount, prodProv: prodProv, prodManu: prodManu },
+   };
+   request.post(options, (error, response, body) => {
+      res.send(body);
+   });
+});
+
+app.post('/productStock/update', (req, res) => {
+   const { prodSeq, prodId, prodAmount, prodProv, prodManu } = req.body;
+   let options = {
+      uri: 'http://192.168.1.58:8000/productStock/update',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 5,
+      },
+      form: { prodSeq: prodSeq, prodId: prodId, prodAmount: prodAmount, prodProv: prodProv, prodManu: prodManu },
+   };
+   request.post(options, (error, response, body) => {
+      res.send(body);
+   });
+   return;
+});
+
+app.post('/productStock/delete', (req, res) => {
+   const { prodSeq } = req.body;
+   let options = {
+      uri: 'http://192.168.1.58:8000/productStock/delete',
+      method: 'POST',
+      header: {
+         'Content-Type': 'application/json',
+         'Content-Length': 5,
+      },
+      form: { prodSeq: prodSeq },
+   };
+
+   request.post(options, (error, response, body) => {
+      res.send(body);
+   });
+   return;
+});
+
 module.exports = app;
