@@ -210,45 +210,22 @@ app.get('/productStock/list', (req, res) => {
       res.send('{"ok":false, "db":"mysql", "service":"productStock/list"}');
       return;
    }
-   // res.writeHead(200);
-   // let temp = '';
-   // for (let i = 0; i < result.length; i++) {
-   //    temp += `<tr><td>${result[i].prodSeq}</td><td>${result[i].prodId}</td><td>${result[i].prodName}</td><td>${result[i].prodArti}</td><td>${result[i].prodAmount}</td></tr>`;
-   // }
-   // let resultPage = makeResultTemplate(`
-   // <table border="1" style="margin: auto; text-align: center">
-   //    <thead>
-   //       <tr>
-   //          <th>PRODUCT INDEX</th>
-   //          <th>PRODUCT ID</th>
-   //          <th>PRODUCT NAME</th>
-   //          <th>PRODUCT ARTIST</th>
-   //          <th>PRODUCT AMOUNT</th>
-   //       </tr>
-   //    </thead>
-   //    <tbody>
-   //       ${temp}
-   //    </tbody>
-   // </table>`);
-   // res.end(resultPage);
 });
 
 app.get('/productStock/search', (req, res) => {
    const prodSeq = req.query.prodSeq;
-   console.log(req.query);
+   // console.log(req.query);
    if (prodSeq == '') {
       res.write("<script>alert('상품 INDEX를 입력하세요.')</script>");
    } else {
-      const result = mysql_conn.query(
+      const productStock = mysql_conn.query(
          'select * from (select ps.prodSeq, p.prodId, p.prodName, p.prodPrice, p.prodArti, ps.prodAmount from productStock ps, product p where p.prodId = ps.prodId) as stock where prodSeq=?',
          [prodSeq],
       );
-      // console.log(result);
-      // res.send(result);
-      if (result.length == 0) {
+      if (productStock.length == 0) {
          res.end('{"ok":false, "service":"search"}');
       } else {
-         res.end(JSON.stringify(result));
+         res.end(JSON.stringify(productStock));
       }
    }
 });

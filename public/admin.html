@@ -7,46 +7,47 @@
       <title>관리자 페이지</title>
       <script>
          function showProductOption(form) {
-            form.style.display = 'block';
+            if (form.style.display == 'block') {
+               form.style.display = 'none';
+            } else if (form.style.display == 'none') {
+               form.style.display = 'block';
+            }
          }
       </script>
    </head>
    <body>
       <h3>관리자 페이지</h3>
-      <input type="button" value="상품 재고 관리" onclick="drawStockTable()" />
-      <input type="button" value="상품 테이블" onclick="productTable()" />
+      <input type="button" value="상품 재고 관리" onclick="showStockTable()" />
       <input type="button" value="상품 추가" onclick="showProductOption(productForm)" />
-      <form method="post" name="productForm" target="targetURL" id="productForm" style="display: none">
+      <form method="post" name="productForm" target="target_stock" id="productForm" style="display: none">
          <hr />
          <p>
             <span style="background-color: aqua">PRODUCT IDEX</span>
-            <input type="number" size="23" name="prodSeq" placeholder="ex) 1" />
+            <input type="number" size="23" name="prodSeq" placeholder="ex) 001" />
          </p>
          <p>
-            <span style="background-color: aqua">PRODUCT ID</span>
+            <span style="background-color: aqua">상품 번호</span>
             <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
          </p>
          <p>
-            <span style="background-color: aqua">PRODUCT AMOUNT</span
+            <span style="background-color: aqua">상품 수량</span
             ><input type="number" size="23" name="prodAmount" placeholder="ex) 1" />
          </p>
          <p>
-            <span style="background-color: aqua">PRODUCT OF </span
+            <span style="background-color: aqua">원산지</span
             ><input type="text" size="23" name="prodProv" placeholder="ex) CHN" />
          </p>
          <p>
-            <span style="background-color: aqua">PRODUCT MAKER</span
+            <span style="background-color: aqua">제조사</span
             ><input type="text" size="23" name="prodManu" placeholder="ex) Edam ent." />
          </p>
 
-         <input type="button" value="PRODUCTS" onclick="document.targetURL.location.href='./productStock/list'" />
-
-         <!-- <input type="button" value="Search PRODUCT" onclick="document.targetURL.location.href='./productStock/search'" /> -->
-
+         <!-- <input type="button" value="PRODUCTS" onclick="document.target_stock.location.href='/productStock/list'" /> -->
+         <input type="button" value="PRODUCTS" onclick="drawStockTable()" />
          <input
             type="button"
             value="Search PRODUCT"
-            onclick="document.targetURL.location.href='./productStock/search?prodSeq='+document.productForm.prodSeq.value"
+            onclick="document.target_stock.location.href='/productStock/search?prodSeq='+document.productForm.prodSeq.value"
          />
 
          <input type="submit" value="Add PRODUCT" formaction="/productStock/insert" />
@@ -59,97 +60,78 @@
       <div style="color: brown; font-weight: 700">상품INDEX - 상품번호 - 상품이름 - 아티스트 - 상품수량</div>
       <div scolling="no" style="overflow: hidden" id="resultTable">
          <iframe
-            src="/productStock/list"
-            name="targetURL"
+            src="./productStock/list"
+            name="target_stock"
             frameborder="0"
             width="80%"
             style="height: 600px; overflow: auto; overflow: no"
          ></iframe>
       </div>
       <script>
-         function productTable() {
-            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
-            let result = document.getElementById('resultTable').children[0].contentWindow.document.body.textContent;
-            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
-            let product = JSON.parse(result).product;
-            // console.log(product);
-            const table = document.createElement('table');
-            const thead = document.createElement('thead');
-            const tr = document.createElement('tr');
-            tr.innerHTML =
-               '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
-            thead.appendChild(tr);
-            const tbody = document.createElement('tbody');
-            let temp = '';
-            for (let i = 0; i < product.length; i++) {
-               temp +=
-                  '<tr><td>' +
-                  product[i].prodId +
-                  '</td><td>' +
-                  product[i].prodName +
-                  '</td><td>' +
-                  product[i].prodPrice +
-                  '</td><td>' +
-                  product[i].prodArti +
-                  '</td><td>' +
-                  product[i].prodImg +
-                  '</td></tr>';
+         function showStockTable() {
+            if (document.getElementById('resultTable').style.display == 'block') {
+               document.getElementById('resultTable').style.display = 'none';
+            } else if (document.getElementById('resultTable').style.display == 'none') {
+               document.getElementById('resultTable').style.display = 'block';
             }
-            tbody.innerHTML = temp;
-            table.appendChild(thead);
-            table.appendChild(tbody);
-            // console.log(table);
-            body.innerHTML = '';
-            let link = document.createElement('link');
-            link.type = 'text/css';
-            link.rel = 'stylesheet';
-            link.href = '../table.css';
-            head.appendChild(link);
-            body.append(table);
          }
+
          function drawStockTable() {
             const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
-            let result = document.getElementById('resultTable').children[0].contentWindow.document.body.textContent;
-            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
-            let productStock = JSON.parse(result).productStock;
-            // console.log(product);
-            const table = document.createElement('table');
-            const thead = document.createElement('thead');
-            const tr = document.createElement('tr');
-            tr.innerHTML =
-               '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
-            thead.appendChild(tr);
-            const tbody = document.createElement('tbody');
-            let temp = '';
-            for (let i = 0; i < productStock.length; i++) {
-               temp +=
-                  '<tr><td>' +
-                  productStock[i].prodSeq +
-                  '</td><td>' +
-                  productStock[i].prodId +
-                  '</td><td>' +
-                  productStock[i].prodName +
-                  '</td><td>' +
-                  productStock[i].prodArti +
-                  '</td><td>' +
-                  productStock[i].prodAmount +
-                  '</td></tr>';
+            console.log(typeof body);
+            let result = '';
+            try {
+               result = JSON.parse(
+                  document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+               );
+               const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+               let ok = result.ok;
+               if (!ok) return;
+               let productStock = result.productStock;
+               // console.log(product);
+               const table = document.createElement('table');
+               const thead = document.createElement('thead');
+               const tr = document.createElement('tr');
+               tr.innerHTML =
+                  '<th>PRODUCT INDEX</th><th>PRODUCT ID</th><th>PRODUCT NAME</th><th>PRODUCT ARTIST</th><th>PRODUCT AMOUNT</th>';
+               thead.appendChild(tr);
+               const tbody = document.createElement('tbody');
+               let temp = '';
+               for (let i = 0; i < productStock.length; i++) {
+                  temp +=
+                     '<tr><td>' +
+                     productStock[i].prodSeq +
+                     '</td><td>' +
+                     productStock[i].prodId +
+                     '</td><td>' +
+                     productStock[i].prodName +
+                     '</td><td>' +
+                     productStock[i].prodArti +
+                     '</td><td>' +
+                     productStock[i].prodAmount +
+                     '</td></tr>';
+               }
+               tbody.innerHTML = temp;
+               table.appendChild(thead);
+               table.appendChild(tbody);
+               // console.log(table);
+               body.innerHTML = '';
+               let link = document.createElement('link');
+               link.type = 'text/css';
+               link.rel = 'stylesheet';
+               link.href = '../table.css';
+               head.appendChild(link);
+               body.append(table);
+            } catch {
+               return;
             }
-            tbody.innerHTML = temp;
-            table.appendChild(thead);
-            table.appendChild(tbody);
-            // console.log(table);
-            body.innerHTML = '';
-            let link = document.createElement('link');
-            link.type = 'text/css';
-            link.rel = 'stylesheet';
-            link.href = '../table.css';
-            head.appendChild(link);
-            body.append(table);
+
             // console.log(body);
          }
          window.onload = () => {
+            document.getElementById('resultTable').style.display = 'none';
             drawStockTable();
+            showStockTable();
          };
       </script>
    </body>
