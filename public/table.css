@@ -39,3 +39,25 @@ tbody tr:hover {
    font-size: 30px;
    text-align: center;
 }
+
+input[type='text'] {
+   background-color: rgb(188, 218, 228);
+}
+
+input[type='number'] {
+   background-color: rgb(188, 218, 228);
+}
+
+button {
+   color: black;
+   background-color: black;
+   border: 3px solid white;
+   border-radius: 4px;
+   padding: 5px 15px;
+   font: bold 15px 'Josefin Sans', sans-serif;
+   cursor: pointer;
+}
+
+button:hover {
+   background: rgba(196, 212, 122, 0.616);
+}
