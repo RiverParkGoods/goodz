@@ -18,6 +18,10 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/error', (req, res) => {
+   res.redirect('error.html');
+});
+
 app.get('/greeting', (req, res) => {
    res.send('Welcome 😊');
 });
@@ -257,8 +261,8 @@ app.post('/order/delete', (req, res, next) => {
 
 app.post('/login', (req, res, next) => {
    let { id, pw } = req.body;
-   if (id == 'admin' && pw == '1234') res.redirect('http://192.168.1.15:8000/admin.html');
-   else res.redirect('login.html');
+   if (id == 'admin' && pw == '1234') res.redirect('http://192.168.1.58:8000/admin.html');
+   else res.redirect('/error');
 });
 
 const request = require('request');
@@ -277,7 +281,7 @@ app.get('/productStock/search', (req, res) => {
    const prodSeq = req.query.prodSeq;
    request(baseURL + '/productStock/search?prodSeq=' + prodSeq, { json: true }, (err, result, productStock) => {
       if (err) res.send(CircularJSON.stringify({ ok: false, db: 'mysql', service: 'productStock/search' }));
-      else res.send(CircularJSON.stringify(productStock));
+      else res.send(CircularJSON.stringify({ ok: true, productStock: productStock }));
    });
    return;
 });

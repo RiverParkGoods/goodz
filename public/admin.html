@@ -3,7 +3,7 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link type="text/css" rel="stylesheet" href="table.css" />
+      <link type="text/css" rel="stylesheet" href="mystyle.css" />
       <title>관리자 페이지</title>
       <script>
          function showProductOption(form) {
@@ -18,50 +18,83 @@
    <body>
       <h3>관리자 페이지</h3>
 
-      <input type="button" value="상품 추가" onclick="showProductOption(productForm)" />
-      <form method="post" name="productForm" target="targetURL" id="productForm" style="display: none">
+      <input type="button" value="재고 관리 기능" onclick="showProductOption(stockForm)" />
+      <input type="button" value="상품 기능" onclick="showProductOption(productForm)" />
+      <form method="post" name="stockForm" target="targetURL" id="stockForm" style="display: none">
          <hr />
-         <p>
-            <span style="background-color: aqua">PRODUCT IDEX</span>
-            <input type="number" size="23" name="prodSeq" placeholder="ex) 001" />
+         <br />
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>상품코드</span>
+            <input type="text" size="23" name="prodSeq" placeholder="ex) 001" />
          </p>
-         <p>
-            <span style="background-color: aqua">상품 번호</span>
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>상품번호</span>
             <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
          </p>
-         <p>
-            <span style="background-color: aqua">상품 수량</span
-            ><input type="number" size="23" name="prodAmount" placeholder="ex) 1" />
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>재고수량</span><input type="text" size="23" name="prodAmount" placeholder="ex) 1" />
          </p>
-         <p>
-            <span style="background-color: aqua">원산지</span
-            ><input type="text" size="23" name="prodProv" placeholder="ex) CHN" />
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>&nbsp;원산지&nbsp;&nbsp;</span><input type="text" size="23" name="prodProv" placeholder="ex) CHN" />
          </p>
-         <p>
-            <span style="background-color: aqua">제조사</span
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>&nbsp;제조사&nbsp;&nbsp;</span
             ><input type="text" size="23" name="prodManu" placeholder="ex) Edam ent." />
          </p>
-
+         <br />
          <input
             type="button"
-            value="PRODUCTS"
-            id="productsBtn"
+            value="재고리스트"
+            id="stockListBtn"
             onclick="document.targetURL.location.href='/productStock/list'"
          />
          <input
             type="button"
-            value="Search PRODUCT"
-            onclick="document.targetURL.location.href='/productStock/search?prodSeq='+document.productForm.prodSeq.value"
+            id="stockFindBtn"
+            value="재고검색"
+            onclick="document.targetURL.location.href='/productStock/search?prodSeq='+document.stockForm.prodSeq.value"
          />
 
-         <input type="submit" value="Add PRODUCT" formaction="/productStock/insert" />
+         <input type="submit" value="재고추가" class="stockBtn" formaction="/productStock/insert" />
+         <input type="submit" value="재고수정" class="stockBtn" formaction="/productStock/update" />
+         <input type="submit" value="재고삭제" class="stockBtn" formaction="/productStock/delete" />
+      </form>
+      <form method="post" name="productForm" target="targetURL" id="productForm" style="display: none">
+         <hr />
+         <br />
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>상품번호</span>
+            <input type="text" size="23" name="prodId" placeholder="ex) 20230301001" />
+         </p>
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>&nbsp;상품명&nbsp;&nbsp;</span
+            ><input type="text" size="23" name="prodName" placeholder="ex) 음파반지" />
+         </p>
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>상품가격</span><input type="text" size="23" name="prodPrice" placeholder="ex) 40000원" />
+         </p>
+         <p style="display: flex; justify-content: space-around; width: 400px; margin: auto">
+            <span>아티스트</span><input type="text" size="23" name="prodArti" placeholder="ex) IU" />
+         </p>
+         <br />
+         <input
+            type="button"
+            value="상품리스트"
+            id="productsBtn"
+            onclick="document.targetURL.location.href='/product/list'"
+         />
+         <input
+            type="button"
+            id="findBtn"
+            value="상품검색"
+            onclick="document.targetURL.location.href='/product/find?prodId='+document.productForm.prodId.value"
+         />
 
-         <input type="submit" value="Modify PRODUCT" formaction="/productStock/update" />
-
-         <input type="submit" value="Remove PRODUCT" formaction="/productStock/delete" />
+         <input type="submit" value="상품추가" class="resBtn" formaction="/product/insert" />
+         <input type="submit" value="상품수정" class="resBtn" formaction="/product/update" />
+         <input type="submit" value="상품삭제" class="resBtn" formaction="/product/delete" />
       </form>
       <hr />
-      <div style="color: brown; font-weight: 700">상품INDEX - 상품번호 - 상품이름 - 아티스트 - 상품수량</div>
       <div scolling="no" style="overflow: hidden" id="resultTable">
          <iframe
             src="./productStock/list"
@@ -110,8 +143,46 @@
             link.rel = 'stylesheet';
             link.href = '../table.css';
             head.appendChild(link);
+            table.style.margin = 'auto';
             body.append(table);
          }
+
+         function drawResultCode(result) {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+
+            let heads = Object.keys(result);
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+
+            for (let th of heads) {
+               tr.innerHTML += '<th>' + th.toUpperCase() + '</th>';
+            }
+
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            let temp = '';
+            temp += '<tr>';
+            for (let head_row = 0; head_row < heads.length; head_row++) {
+               temp += '<td>' + result[heads[head_row]] + '</td>';
+            }
+            temp += '</tr>';
+
+            tbody.innerHTML = temp;
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            body.innerHTML = '';
+            let link = document.createElement('link');
+            link.type = 'text/css';
+            link.rel = 'stylesheet';
+            link.href = '../table.css';
+            head.appendChild(link);
+            table.style.margin = 'auto';
+            body.append(table);
+         }
+
          window.onload = () => {
             setTimeout(() => {
                let result = JSON.parse(
@@ -120,7 +191,7 @@
                let productStock = result.productStock;
                if (result.ok) productTable(productStock);
             }, 100);
-            document.getElementById('productsBtn').addEventListener('click', () => {
+            document.getElementById('stockListBtn').addEventListener('click', () => {
                setTimeout(() => {
                   let result = JSON.parse(
                      document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
@@ -128,6 +199,58 @@
                   let productStock = result.productStock;
                   if (result.ok) productTable(productStock);
                }, 100);
+            });
+            document.getElementById('stockFindBtn').addEventListener('click', () => {
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let productStock = result;
+                  if (productStock) productTable(productStock);
+               }, 100);
+            });
+            let sts = document.getElementsByClassName('stockBtn');
+            let sts_arr = Array.from(sts);
+            sts_arr.forEach(sts => {
+               sts.addEventListener('click', () => {
+                  setTimeout(() => {
+                     let result = JSON.parse(
+                        document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                     );
+                     if (result.ok) drawResultCode(result);
+                  }, 100);
+               });
+            });
+            document.getElementById('productsBtn').addEventListener('click', () => {
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  if (result.ok) productTable(product);
+               }, 100);
+            });
+            document.getElementById('findBtn').addEventListener('click', () => {
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  // console.log(product[0]);
+                  if (result.ok) productTable(product);
+               }, 100);
+            });
+            let bts = document.getElementsByClassName('resBtn');
+            let bts_arr = Array.from(bts);
+            bts_arr.forEach(bts => {
+               bts.addEventListener('click', () => {
+                  setTimeout(() => {
+                     let result = JSON.parse(
+                        document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                     );
+                     if (result.ok) drawResultCode(result);
+                  }, 100);
+               });
             });
          };
       </script>

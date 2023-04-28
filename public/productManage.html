@@ -3,11 +3,11 @@
    <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link type="text/css" rel="stylesheet" href="table.css" />
-      <title>상품 테이블</title>
+      <link type="text/css" rel="stylesheet" href="mystyle.css" />
+      <title>상품 검색</title>
    </head>
    <body>
-      <h3>상품 테이블</h3>
+      <h3>상품 검색</h3>
 
       <hr />
       <form method="post" name="productForm" target="targetURL">
@@ -23,6 +23,7 @@
             <input
                type="button"
                value="검색"
+               id="findBtn"
                onclick="document.targetURL.location.href='./product/search?keyword='+document.productForm.keyword.value+'&searchway='+document.productForm.searchway.value"
             />
          </p>
@@ -34,9 +35,8 @@
             value="PRODUCTS"
             onclick="document.targetURL.location.href='./product/list'"
          />
-         <input type="submit" value="Modify PRODUCT" formaction="/product/update" />
-
-         <input type="submit" value="Remove PRODUCT" formaction="/product/delete" />
+         <!-- <input type="submit" class="resBtn" value="Modify PRODUCT" formaction="/product/update" />
+         <input type="submit" class="resBtn" value="Remove PRODUCT" formaction="/product/delete" /> -->
       </form>
       <hr />
       <div style="color: brown; font-weight: 700">상품ID - 상품명 - 상품가격 - 아티스트</div>
@@ -88,6 +88,43 @@
             link.rel = 'stylesheet';
             link.href = '../table.css';
             head.appendChild(link);
+            table.style.margin = 'auto';
+            body.append(table);
+         }
+
+         function drawResultCode(result) {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+
+            let heads = Object.keys(result);
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+
+            for (let th of heads) {
+               tr.innerHTML += '<th>' + th.toUpperCase() + '</th>';
+            }
+
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            let temp = '';
+            temp += '<tr>';
+            for (let head_row = 0; head_row < heads.length; head_row++) {
+               temp += '<td>' + result[heads[head_row]] + '</td>';
+            }
+            temp += '</tr>';
+
+            tbody.innerHTML = temp;
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            body.innerHTML = '';
+            let link = document.createElement('link');
+            link.type = 'text/css';
+            link.rel = 'stylesheet';
+            link.href = '../table.css';
+            head.appendChild(link);
+            table.style.margin = 'auto';
             body.append(table);
          }
          window.onload = () => {
@@ -107,6 +144,28 @@
                   let product = result.product;
                   if (result.ok) productTable(product);
                }, 100);
+            });
+            document.getElementById('findBtn').addEventListener('click', () => {
+               console.log('검색');
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  let product = result.product;
+                  if (result.ok) productTable(product);
+               }, 100);
+            });
+            let bts = document.getElementsByClassName('resBtn');
+            let bts_arr = Array.from(bts);
+            bts_arr.forEach(bts => {
+               bts.addEventListener('click', () => {
+                  setTimeout(() => {
+                     let result = JSON.parse(
+                        document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                     );
+                     if (result.ok) drawResultCode(result);
+                  }, 100);
+               });
             });
          };
       </script>

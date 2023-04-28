@@ -44,7 +44,7 @@
             </span>
             <span>
                <input type="number" id="productQty" name="orderAmount" />&nbsp;수량&nbsp;
-               <input type="submit" value="구매" formaction="/order/insert" />
+               <input type="submit" id="purchaseBtn" value="구매" formaction="/order/insert" />
             </span>
          </form>
       </div>
@@ -91,6 +91,43 @@
             link.rel = 'stylesheet';
             link.href = '../table.css';
             head.appendChild(link);
+            table.style.margin = 'auto';
+            body.append(table);
+         }
+
+         function drawResultCode(result) {
+            const body = document.getElementById('resultTable').children[0].contentWindow.document.body;
+            const head = document.getElementById('resultTable').children[0].contentWindow.document.head;
+
+            let heads = Object.keys(result);
+
+            const table = document.createElement('table');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
+
+            for (let th of heads) {
+               tr.innerHTML += '<th>' + th.toUpperCase() + '</th>';
+            }
+
+            thead.appendChild(tr);
+            const tbody = document.createElement('tbody');
+            let temp = '';
+            temp += '<tr>';
+            for (let head_row = 0; head_row < heads.length; head_row++) {
+               temp += '<td>' + result[heads[head_row]] + '</td>';
+            }
+            temp += '</tr>';
+
+            tbody.innerHTML = temp;
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            body.innerHTML = '';
+            let link = document.createElement('link');
+            link.type = 'text/css';
+            link.rel = 'stylesheet';
+            link.href = '../table.css';
+            head.appendChild(link);
+            table.style.margin = 'auto';
             body.append(table);
          }
          window.onload = () => {
@@ -113,6 +150,15 @@
                   if (result.ok) productTable(product);
                   const prodPrice = document.getElementById('prodPrice');
                   prodPrice.value = product[0].prodPrice;
+               }, 100);
+            });
+            document.getElementById('purchaseBtn').addEventListener('click', () => {
+               console.log('눌림');
+               setTimeout(() => {
+                  let result = JSON.parse(
+                     document.getElementById('resultTable').children[0].contentWindow.document.body.textContent,
+                  );
+                  if (result.ok) drawResultCode(result);
                }, 100);
             });
          };
