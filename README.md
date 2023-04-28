@@ -2,16 +2,16 @@
 
 ## DB
 
--  Product (Mysql)
--  ProductStock (Mysql)
--  OrderList (MongoDB)
+-  Product&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Mysql)
+-  ProductStock&nbsp;&nbsp;&nbsp;(Mysql)
+-  OrderList&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(MongoDB)
 
 ---
 
 ## Server
 
--  Ubuntu (local : 192.168.1.15:8000)
--  Ubuntu (Remote : 192.168.1.58:8000)
+-  Ubuntu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(local : 192.168.1.15:8000)
+-  Ubuntu&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Remote : 192.168.1.58:8000)
 
 ---
 
@@ -34,21 +34,30 @@
 |--woodz.html <br>
 |-----woodz_profile.html <br>
 
+---
+
+//토스만 하는 API는 link로, 기능이 있는 API는 다른 형태로
+
 ## API - Local
 
 -  ETC <br>
    -  welcome, error
 -  Product <br>
    -  list, search, find, artist, insert, update, delete
--  ## ProductStock <br>
+-  ProductStock <br>
+   -  list, search, insert, update, delete
 -  OrderList <br>
    -  list, search, insert, update, delete
 
+---
+
 ## API - Remote
 
+-  ETC <br>
+   -  welcome, error
 -  Product <br>
-   |
+   -  list, search, find, artist, insert, update, delete
 -  ProductStock <br>
-   |
+   -  list, search, insert, update, delete
 -  OrderList <br>
-   |
+   -  list, search, insert, update, delete
